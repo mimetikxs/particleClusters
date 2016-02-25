@@ -1,0 +1,22 @@
+body {
+    overflow: hidden;
+}
+
+#layer-gl {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#title {
+    position: absolute;
+    bottom: 0;
+    color: rgb(121, 121, 121);
+    padding-left: 20px;
+    font-size: 14px;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
