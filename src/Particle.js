@@ -8,6 +8,8 @@ APP.Particle = function( x, y, z, drag ) {
     this.constraints = [];
     this.drag = (typeof drag !== 'undefined') ? drag : 0.9;;   // 1 = no drag, 0 = max drag. default is 0.9
 
+    this.data; // arbitraty data
+
 }
 
 APP.Particle.prototype = {

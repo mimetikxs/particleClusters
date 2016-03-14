@@ -2,10 +2,55 @@ body {
     overflow: hidden;
 }
 
+#layer-nodes,
 #layer-gl {
     position: absolute;
     width: 100%;
     height: 100%;
+    top: 0;
+    right: 0;
+}
+
+#layer-nodes {
+  -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
+  -ms-transform: translate3d(0,0,0);
+  -o-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+}
+
+.node {
+    position: absolute;
+
+    .circle {
+        position: relative;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        margin-top: -50%;
+        margin-left: 50%;
+        opacity: 0.8;
+
+        transition: all 300ms;
+    }
+
+    &:hover {
+        .circle {
+            opacity: 1.0;
+            -ms-transform: scale(2.5);
+            -webkit-transform: scale(2.5);
+            transform: scale(2.5);
+        }
+    }
+}
+
+#logo {
+    position: absolute;
+    width: 130px;
+    height: 69px;
+    background: url("../assets/logo.png") no-repeat;
+    background-size: 100%;
+    margin: 15px;
 }
 
 #title {
@@ -19,4 +64,46 @@ body {
 canvas {
     width: 100%;
     height: 100%;
+}
+
+
+// bottom bar
+
+#bottom-bar {
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    cursor: pointer;
+
+    .button {
+        box-sizing: border-box;
+        margin: 0px;
+        border-top: 5px solid #F39C12;
+        //display: inline-block;
+        float: left;
+        width: 16.6666%;
+        padding: 7px 15px;
+        background-color: rgba(255, 255, 255, 0.3);
+        transition: background-color 400ms ease-in-out, color 400ms ease-in-out;
+
+        .title {
+            font-size: 18px;
+            //font-family: "PFDinTextPro-Bold", sans-serif;
+            line-height: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        &:hover,
+        &.active {
+            color: #ffffff;
+        }
+    }
 }

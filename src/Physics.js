@@ -73,6 +73,12 @@ APP.Physics.prototype = {
 
         this.springs.push( s );
 
+    },
+
+    addAttraction : function( a ) {
+
+        this.attractions.push( a );
+
     }
 
 }

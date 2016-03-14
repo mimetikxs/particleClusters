@@ -8,8 +8,62 @@
     <body>
 
         <div id="layer-gl"></div>
+        <div id="layer-nodes"></div>
 
-        <p id="title">PARTICLE CLUSTER EDITOR</p>
+        <div id="logo"></div>
+
+        <div id="bottom-bar">
+            <div class="button" id="category-0">
+                <div class="title">
+                    All
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+            <div class="button" id="category-1">
+                <div class="title">
+                    Category 1
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+            <div class="button" id="category-2">
+                <div class="title">
+                    Category 2
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+            <div class="button" id="category-3">
+                <div class="title">
+                    Category 3
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+            <div class="button" id="category-4">
+                <div class="title">
+                    Category 4
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+            <div class="button" id="category-5">
+                <div class="title">
+                    Category 5
+                </div>
+                <div class="subtitle">
+                    Lorem ipsum dolor sit amet
+                </div>
+            </div>
+        </div>
+
+        <!-- <p id="title">PARTICLE CLUSTER EDITOR</p> -->
 
         <script src="lib/jquery-1.12.0.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
@@ -24,45 +78,98 @@
         <script src="src/SpringMinDist.js"></script>
         <script src="src/Attraction.js"></script>
         <script src="src/Physics.js"></script>
+        <script src="src/Noise.js"></script>
+        <script src="src/Walker2.js"></script>
+        <script src="src/Cluster.js"></script>
+
+
+        <script type="x-shader/x-vertex" id="vertexshader">
+
+			attribute float size;
+			attribute vec3 customColor;
+            attribute float imageFlag;
+
+            varying vec3 vColor;
+            varying float vImgIndex;
+
+			void main() {
+
+				vColor = customColor;
+                vImgIndex = imageFlag;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_PointSize = size * 2.0;
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform sampler2D texture;
+            uniform sampler2D texture2;
+            uniform sampler2D texture3;
+
+			varying vec3 vColor;
+            varying float vImgIndex;
+
+			void main() {
+
+                vec4 texColor = ( vImgIndex == 0.0 ) ? texture2D( texture, gl_PointCoord ) :
+                                ( vImgIndex == 1.0 ) ? texture2D( texture2, gl_PointCoord ) :
+                                texture2D( texture3, gl_PointCoord );
+
+				gl_FragColor = vec4( vColor, 0.8 );
+				gl_FragColor = gl_FragColor * texColor;
+
+			}
+
+		</script>
+
 
         <script>
 
+            // render 3D
+            var scene, camera, renderer,
+                sprite, sprite2,
+                materialPoints, materialLines;
 
-        // TODO: hacer que los clusters "florezcan" cuando el raton se acerca a ellos.
+            // render DOM
+            var nodes = [];
 
-            var scene, camera, renderer;
-
-            // cluter physics model
+            // physics model
             var physics,
-                sphereConstraint,
-                centralParticle,
-                particles = [],
-                interactiveParticles = [],
-                radialSprings = [],
-                surfaceSprings = [],
-                centerAttractions = [],
-                mouseAttractions = [],
+                clusters = [],
+                mouseParticle,
+                clusterParticles = 50,
+
+                clusterPositions; // TODO: create data object
+
+            var sceneWidth, sceneHeight,
 
                 backgroundColor,
 
-                sprite, sprite2,
+                //stats,
+                gui;
 
-                // geometryPoints,
-                geometriesPoints = [], points, materialPoints,
-                geometryLines, lines, materialLines,
-                circleGeometry, circle, circleMaterial;
 
-            var geometryMouseLines, mouseLines;
+            // TODO:
+            // states
+            var currentState; // state_ClustersAll, state_ClusterFilter, state_NodeView, state_VideoView
 
-            var mouseParticle,
-                sceneWidth, sceneHeight;
+            var activeCluster, activeNode; // TODO: move to state
 
-            var stats;
+            //TODO: use states to avoid flags
+            var useMouseInteraction = true;
 
-            var gui, guiParameters;
 
             init();
             animate();
+
 
             function init() {
 
@@ -71,257 +178,294 @@
                 sceneWidth = $holder.width();
                 sceneHeight = $holder.height();
 
+                backgroundColor = new THREE.Color( 0xF2F3F4 );
+
                 scene = new THREE.Scene();
 
-                //camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
                 camera = new THREE.OrthographicCamera( sceneWidth / -2, sceneWidth / 2, sceneHeight / 2, sceneHeight / -2, 1, 1000 );
                 camera.position.z = 500;
 
                 renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( sceneWidth, sceneHeight );
-                // renderer.setClearColor( 0x000000 );
-
-                backgroundColor = new THREE.Color( 0xF2F3F4 );
                 renderer.setClearColor( backgroundColor.getHex() );
 
 		        $holder.append( $(renderer.domElement) );
 
-                buildGui();
+                //buildGui();
 
-                buildCluster();
-
-                // stats
-                stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-                document.body.appendChild( stats.domElement );
+                initMaterials();
+                initPhysics();
+                buildClusters();
 
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                window.addEventListener( 'resize', onWindowResize, false );
+
+                onWindowResize();
 
             }
+
 
             function animate() {
 
                 requestAnimationFrame( animate );
 
-                stats.begin();
+                //stats.begin();
 
                 physics.update();
 
-                for (var i = 0; i < geometriesPoints.length; i++) geometriesPoints[ i ].verticesNeedUpdate = true;
-                geometryLines.verticesNeedUpdate = true;
-                geometryMouseLines.verticesNeedUpdate = true;
+                // clusters
+                for ( var i = 0; i < clusters.length; i++ ) {
+                    clusters[ i ].update();
+                }
 
                 updateMouseInteraction();
 
+                // nodes
+
+                // var projScreenMat = new THREE.Matrix4();
+                // projScreenMat.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+                for ( var i = 0; i < nodes.length; i++ ) {
+                    var $node = nodes[ i ],
+                        particle = $node.data("particle"),
+                        screenPos = particle.pos.clone();
+
+                        // transform
+                        screenPos.x = sceneWidth - (screenPos.x + sceneWidth/2);
+        				screenPos.y = sceneHeight/2 - screenPos.y;
+                        // screenPos.applyMatrix4( projScreenMat );	           // NDC (-1.0..1.0)
+        				// screenPos.x = ( - screenPos.x + 1 ) * sceneWidth/2;    // viewport transform
+        		        // screenPos.y = ( - screenPos.y + 1 ) * sceneHeight/2;
+
+
+                    $node.css({
+                        right : screenPos.x,
+                        top : screenPos.y
+                    });
+
+                }
+
                 renderer.render( scene, camera );
 
-                stats.end();
+                //stats.end();
 
             }
 
 
-            function buildGui() {
-                // gui
-                guiParameters = {
-                    cluster_radius     : 200.0,
-                    radial_strength    : 1.0, //2.0,
-                    surface_strength   : 0.00005,
-                    central_attraction : 0,//1, //-300.0,
-                    gravity           : 0, //2.0,
-                    mouse_attraction   : 0, //100.0,
-                    background_darkness : 0.0
-                }
-                gui = new dat.GUI( {width:350});
+            function initPhysics() {
 
-                gui.add( guiParameters, 'cluster_radius', 10.0, 250.0 ).onChange( onClusterRadius );
-                gui.add( guiParameters, 'radial_strength', 0.00001, 1.0 ).onChange( onRadialStrength );
-                gui.add( guiParameters, 'surface_strength', 0.0, 0.05 ).onChange( onSurfaceStrength );
-                gui.add( guiParameters, 'central_attraction', -1000.0, 1000.0 ).onChange( onCentralRepulsion );
-                gui.add( guiParameters, 'gravity', 0.0, 10.0 ).onChange( onGravity );
-                gui.add( guiParameters, 'mouse_attraction', -500.0, 500.0 ).onChange( onMouseAttraction );
-                gui.add( guiParameters, 'background_darkness', 0.0, 1.0 ).onChange( onBackgroundDarkness );
-            }
-
-            function buildCluster() {
-
-                // ---------------------------
-                // physics model
-
-                physics = new APP.Physics();
-
-                centralParticle = new APP.Particle(0, 0, 0);
-                centralParticle.isFixed = true;
-
-                var clusterCenter = new THREE.Vector3();
-
-                sphereConstraint = new APP.Constraint( clusterCenter, guiParameters.cluster_radius );
-
-                // create particles at random positions within the constraining sphere
-                var spanRaadius = 20;
-                for ( var i = 0; i < 50; i++ ) {
-                    var x = Math.random() * (spanRaadius*2) - spanRaadius,
-                        y = Math.random() * (spanRaadius*2) - spanRaadius,
-                        z = Math.random() * spanRaadius;
-
-                    particle = new APP.Particle( x, y, z );
-                    //particle.constraints.push( sphereConstraint );
-
-                    particles.push( particle );
-                    physics.addParticle( particle );
-                }
-
-                // connect the particles with the center of the constraining sphere
-                for ( var i = 0; i < particles.length; i++ ) {
-                    var spring = new APP.Spring( centralParticle, particles[ i ], guiParameters.cluster_radius );
-                    spring.strength = guiParameters.radial_strength;
-
-                    radialSprings.push( spring );
-                    physics.addSpring( spring );
-                }
-
-                // connect particles between them to avoid collisions
-                var i, j, a, b;
-
-    			for ( i=0; i<particles.length-1; ++i ) {
-    				for ( j=i+1; j<particles.length; ++j ) {
-    					a = particles[ i ];
-    					b = particles[ j ];
-
-    					var spring = new APP.SpringMinDist( a, b );
-                        spring.setLength( guiParameters.cluster_radius );
-                        // dirty test: interactive clusters (the first 4) have stroger springs to avoid overlaping
-                        // spring.strength = Math.random() * 0.005;
-                        spring.percent = ( i < 8 && j < 4) ? 1.0 : Math.random();
-                        spring.strength = guiParameters.surface_strength;
-
-                        surfaceSprings.push( spring )
-    					physics.addSpring( spring );
-    				}
-    			}
-
-                // create a particle for the mouse
                 mouseParticle = new APP.Particle(0, 0, 0);
                 mouseParticle.isFixed = true;
 
-                //testing
-                // particles[0].isFixed = true;
-
-                physics.addParticle( mouseParticle );
-
-                // Attraction to mouse
-                for ( var i = 0; i < particles.length; i++ ) {
-                    var attraction = new APP.Attraction( mouseParticle, particles[i], guiParameters.mouse_attraction );
-                    attraction.distMin = 30;
-                    attraction.distMax = guiParameters.cluster_radius;
-
-                    mouseAttractions.push( attraction );
-                    physics.attractions.push( attraction );
-                }
-
-                // repulsion/attraction to center
-                for ( var i = 0; i < particles.length; i++ ) {
-                    var attraction = new APP.Attraction( centralParticle, particles[i], guiParameters.central_attraction );
-                    attraction.distMin = 50;
-                    attraction.distMax = guiParameters.cluster_radius;
-
-                    centerAttractions.push( attraction );
-                    physics.attractions.push( attraction );
-                }
-
-                // --------------------------
-                // points view
-                // each material is applied to a THREE.Points object
-                // TODO: use shaders to optimize variations in size and color
-
-                sprite1 = new THREE.TextureLoader().load( "assets/circle-fill.png" );
-                sprite2 = new THREE.TextureLoader().load( "assets/circle-marked.png" );
-
-                var styles = [
-					[ 0xF39C12, 30, sprite2 ],
-                    [ 0xE74C3C, 12, sprite1 ],
-                    [ 0x8E44AD, 18, sprite1 ],
-                    [ 0x3498DB, 15, sprite1 ],
-                    [ 0x1ABC9C, 6, sprite1 ],
-				];
-
-                var numParticles = particles.length,
-                    numStyles = styles.length,
-                    numParticlesPerStyle = Math.round( numParticles / numStyles ),
-                    i, pointCount, pointIndex = 0, color, size, sprite,
-                    materialPoints, geomPoints, points;
-
-                for ( i = 0; i < numStyles; i++ ) {
-                    color = styles[ i ][ 0 ];
-                    size = styles[ i ][ 1 ];
-                    sprite = styles[ i ][ 2 ];
-
-                    //materialPoints = new THREE.PointsMaterial( { size: size, sizeAttenuation: false } );
-                    materialPoints = new THREE.PointsMaterial( { size: size, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-                    materialPoints.color.setHex( color );
-
-                    geomPoints = new THREE.Geometry();
-                    pointCount = 0;
-                    while ( pointCount < numParticlesPerStyle  &&  pointIndex < numParticles-1 ) {
-                        pointIndex = i * numParticlesPerStyle + pointCount;
-
-                        geomPoints.vertices.push( particles[ pointIndex ].pos );
-                        pointCount++;
-                    }
-
-                    points = new THREE.Points( geomPoints, materialPoints );
-
-                    geometriesPoints.push( geomPoints );
-
-                    scene.add( points );
-                }
-
-                // --------------------------
-                // lines view
-
-                materialLines = new THREE.LineBasicMaterial( { color: 0xdddddd, linewidth: 1, transparent: true, opacity: 0.2 } );
-                materialLines.visible = true;
-
-                geometryLines = new THREE.Geometry();
-                for ( var i = 0; i < particles.length; i++ ) {
-                    geometryLines.vertices.push( centralParticle.pos, particles[ i ].pos );
-                }
-
-                lines = new THREE.LineSegments( geometryLines, materialLines );
-
-                scene.add( lines );
-
-                // --------------------------
-                // central circle
-
-                // var radius = 50;
-                // var segments = 32;
-                //
-                // circleMaterial = new THREE.MeshBasicMaterial( { color: 0xF39C12 } );
-                // circleMaterial.color.offsetHSL(0,0,-0.2);
-                //
-                // circleGeometry = new THREE.CircleGeometry( radius, segments );
-                //
-                // circle = new THREE.Mesh( circleGeometry, circleMaterial );
-                // scene.add( circle );
-
-                // --------------------------
-                // mouse lines view
-
-                geometryMouseLines = new THREE.Geometry();
-
-                for (var i = 0; i < physics.attractions.length; i++) {
-                    var attraction = physics.attractions[i];
-
-                    geometryMouseLines.vertices.push( attraction.a.pos, attraction.b.pos )
-                }
-
-                //mouseLines = new THREE.LineSegments( geometryMouseLines, materialLines );
-
-                //scene.add( mouseLines );
+                physics = new APP.Physics();
+                physics.gravity.z = APP.parameters.gravity;
 
             }
+
+
+            function initMaterials() {
+
+                var uniforms = {
+            		texture:  { type: "t", value: new THREE.TextureLoader().load( "assets/circle-fill.png" ) },
+            		texture2: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-line.png" ) },
+                    texture3: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-marked.png" ) }
+            	};
+
+                materialPoints = new THREE.ShaderMaterial( {
+    				uniforms: uniforms,
+    				vertexShader: document.getElementById( 'vertexshader' ).textContent,
+    				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+    				// blending:        THREE.AdditiveBlending,
+    				depthTest:       false,
+    				transparent:     true,
+                    alphaTest:       0.5
+    			});
+
+                materialLines = new THREE.LineBasicMaterial( { color: 0xdddddd, linewidth: 1, transparent: true, opacity: 0.2, depthTest: false } );
+                materialLines.visible = false;
+
+            }
+
+
+            function buildClusters() {
+
+                for (var i = 0; i < APP.data.length; i++) {
+                    var clusterData = APP.data[ i ];
+                    var pos = clusterData.position.clone();
+                    pos.x *= sceneWidth/2;
+                    pos.y *= sceneHeight/2;
+                    var numParticles = 20 + Math.random() * 10; // number of background particles
+
+                    var cluster = new APP.Cluster( mouseParticle, materialPoints, materialLines );
+                    cluster.setup( clusterData, numParticles, pos );
+                    cluster.addToPhysics( physics );
+                    cluster.addToScene( scene );
+
+                    clusters.push( cluster );
+                }
+
+                // interactive nodes
+
+                var $layer = $('#layer-nodes'),
+                    i, j,
+                    clusterData,
+                    cluster,
+                    particles,
+                    node,
+                    size,
+                    clusterColor = new THREE.Color();
+
+                for ( i = 0; i < APP.data.length; i++ ) {
+                    clusterData = APP.data[ i ],
+                    cluster = clusters[ i ],
+
+                    particles = cluster.interactiveParticles;
+
+                    clusterColor.setHex( clusterData.color );
+
+                    for ( j = 0; j < particles.length; j++ ) {
+                        particle = particles[ j ];
+
+                        size = particle.data.size;
+
+                        $node = $( APP.templates.nodeTemplate );
+                        $node.data( 'particle', particle );
+                        $node.find('.circle').css({
+                            'background-color' : '#' + clusterColor.getHexString(),
+                            'width': size,
+                            'height': size
+                        });
+
+                        nodes.push( $node );
+
+                        $layer.append( $node );
+                    }
+                }
+
+                // buttons
+                var $bottomBar = $( '#bottom-bar' ),
+                    r, g, b, a,
+                    rgba;
+
+                for ( i = 0; i < APP.data.length; i++ ) {
+                    clusterData = APP.data[ i ];
+                    cluster = clusters[ i ];
+                    clusterColor.setHex( clusterData.color );
+
+                    r = clusterColor.r * 255;
+                    g = clusterColor.g * 255;
+                    b = clusterColor.b * 255;
+                    a = 0.5;
+                    rgba = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+
+                    $bottomBar
+                        .find( '#' + clusterData.slug )
+                        .css( 'border-top-color', '#' + clusterColor.getHexString() )
+                        .data( 'cluster', cluster )
+                        .data( 'color', rgba )
+                }
+
+                clusterColor.setHex( '#777777' );
+                r = clusterColor.r * 255;
+                g = clusterColor.g * 255;
+                b = clusterColor.b * 255;
+                a = 0.5;
+                rgba = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+
+                $bottomBar
+                    .find( '#category-0' )
+                    .css( 'border-top-color', '#777777' )
+                    .data( 'color', rgba );
+
+
+                $bottomBar
+                    .on( 'click', '.button', function() {
+                        $bottomBar.find('.active')
+                            .removeClass( 'active' )
+                            .css( 'background-color', '' );
+
+                        $( this )
+                            .addClass( 'active' )
+                            .css( 'background-color', $( this ).data( 'color' ) );
+
+                        selectCluster( $( this ).data( 'cluster' ) );
+                    })
+                    .on( 'mouseenter', '.button', function() {
+                        $( this ).css( 'background-color', $( this ).data( 'color' ) );
+                    })
+                    .on( 'mouseleave', '.button', function() {
+                        if ( !$( this ).hasClass( 'active' ) ){
+                            $( this ).css( 'background-color', '' );
+                        }
+                    });
+
+                // TODO: fix
+                var $all = $bottomBar.find( '#category-0' )
+                $all
+                    .addClass( 'active' )
+                    .css( 'background-color', $all.data( 'color' ) );
+            }
+
+
+            function selectCluster( newCluster ) {
+
+                // filter off
+
+                if ( newCluster === undefined ){
+
+                    physics.gravity.z = APP.parameters.gravity;
+
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        setClusterState( clusters[ i ], APP.clusterStates.default );
+                    }
+
+                    activeCluster = newCluster;
+
+                    useMouseInteraction = true;
+
+                    return; // stop here
+                }
+
+                // filter on
+
+                if ( newCluster === activeCluster ) {
+                    return;
+                }
+
+                // test
+                physics.gravity.z = 3.21;
+
+                for ( var i = 0; i < clusters.length; i++ ) {
+                    var cluster = clusters[i];
+                    if ( cluster === newCluster ) {
+                        setClusterState( cluster, APP.clusterStates.opened );
+
+                    } else {
+                        setClusterState( cluster, APP.clusterStates.closed );
+                    }
+                }
+
+                activeCluster = newCluster;
+
+                useMouseInteraction = false;
+
+            }
+
+
+            function setClusterState( cluster, state ) {
+
+                cluster.setClusterRadius( state['cluster_radius'] );
+                cluster.setSurfaceStrength( state['surface_strength'] );
+                cluster.setCentralAttraction( state['central_attraction'] );
+                cluster.setMouseAttraction( state['mouse_attraction'] );
+                cluster.setSpringStrengthInteractive( state['spring_strength_interactive'] );
+                cluster.setSpringLengthInteractive( state['spring_length_interactive'] );
+                cluster.setAttractionStrengthInteractive( state['attraction_strength_interactive'] );
+
+            }
+
 
             function onDocumentMouseMove( event ) {
 
@@ -330,84 +474,161 @@
 
 			}
 
+
+            function onWindowResize( event ) {
+
+                var $holder = $('#layer-gl');
+
+                sceneWidth = $holder.width();
+                sceneHeight = $holder.height();
+
+                camera.left = sceneWidth / -2;
+                camera.right = sceneWidth / 2;
+                camera.top = sceneHeight / 2;
+                camera.bottom = sceneHeight / -2;
+                camera.updateProjectionMatrix();
+
+                for (var i = 0; i < APP.data.length; i++) {
+                    var clusterData = APP.data[ i ];
+                    var pos = clusterData.position.clone();
+                    pos.y += 0.1;
+                    pos.x *= sceneWidth/2;
+                    pos.y *= sceneHeight/2;
+
+                    clusters[ i ].setPosition( pos );
+                }
+
+                renderer.setSize( sceneWidth, sceneHeight );
+
+            }
+
+
             function updateMouseInteraction() {
 
-                var attractions = physics.attractions;
+                for ( var i = 0; i < clusters.length; i++ ) {
+                    var cluster = clusters[ i ];
 
-                // for ( var i = 0; i < attractions.length; i++ ) {
-                // }
+                    var delta = new THREE.Vector3();
+                        delta.subVectors( mouseParticle.pos, cluster.centralParticle.pos );
 
+                    var distance = delta.length(),
+                        numMouseAttractions = cluster.mouseAttractions.length,
+                        enabled = (distance < cluster.limitDistance) ? true : false;
 
-                // testing
-                //particles[0].pos.copy(mouseParticle.pos)
-            }
+                    // enable / disable mouse attractions
+                    for ( var j = 0; j < numMouseAttractions; j++ ) {
+                        cluster.mouseAttractions[ j ].enabled = enabled;
+                    }
 
-            function onClusterRadius( value ) {
+                    if ( useMouseInteraction ) {
+                        // strength of attraction relative to mouse distance to center
+                        distance = (distance < cluster.limitDistance) ? distance : cluster.limitDistance;
+                        var attractionStrength = (distance / cluster.limitDistance) * 100;
 
-                var radius = value;
-
-                sphereConstraint.radius = radius;
-
-                for ( var i = 0; i < radialSprings.length; i++ ) {
-                    radialSprings[i].restLength = radius;
-                }
-
-                for ( var i = 0; i < surfaceSprings.length; i++ ) {
-                    surfaceSprings[i].setLength( radius );
-                }
-
-                for ( var i = 0; i < mouseAttractions.length; i++ ) {
-                    mouseAttractions[i].distMax = radius;
-                }
-
-                for ( var i = 0; i < centerAttractions.length; i++ ) {
-                    centerAttractions[i].distMax = radius;
+                        cluster.setCentralAttraction( attractionStrength );
+                    }
                 }
 
             }
 
-            function onRadialStrength( value ) {
 
-                for ( var i = 0; i < radialSprings.length; i++ ) {
-                    radialSprings[i].strength = value;
+            // gui -----------------------------------
+
+
+            function buildGui() {
+
+                // stats = new Stats();
+				// stats.domElement.style.position = 'absolute';
+				// stats.domElement.style.top = '0px';
+                // document.body.appendChild( stats.domElement );
+
+                gui = new dat.GUI( { width: 350 } );
+
+                gui.remember( APP.parameters );
+
+                gui.add( APP.parameters, 'cluster_radius', 10.0, 250.0 ).onChange( onClusterRadius );
+                gui.add( APP.parameters, 'surface_strength', 0.0, 0.05 ).onChange( onSurfaceStrength );
+                gui.add( APP.parameters, 'central_attraction', -1000.0, 1000.0 ).onChange( onCentralRepulsion );
+                gui.add( APP.parameters, 'mouse_attraction', -500.0, 500.0 ).onChange( onMouseAttraction );
+
+                gui.add( APP.parameters, 'spring_strength_interactive', 0.0, 0.5 ).onChange( onSpringStrengthInteractive );
+                gui.add( APP.parameters, 'spring_length_interactive', 0.0, 200.0 ).onChange( onSpringLengthInteractive );
+                gui.add( APP.parameters, 'attraction_strength_interactive', -1000.0, 1000.0 ).onChange( onAttractionStrengthInteractive );
+
+                gui.add( APP.parameters, 'gravity', 0.0, 10.0 ).onChange( onGravity );
+                gui.add( APP.parameters, 'background_darkness', 0.0, 1.0 ).onChange( onBackgroundDarkness );
+
+                // callbacks
+
+                function onClusterRadius( value ) {
+
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setClusterRadius( value );
+                    }
+
                 }
 
-            }
+                function onSurfaceStrength( value ) {
 
-            function onSurfaceStrength( value ) {
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setSurfaceStrength( value );
+                    }
 
-                for ( var i = 0; i < surfaceSprings.length; i++ ) {
-                    surfaceSprings[i].strength = value;
                 }
 
-            }
+                function onCentralRepulsion( value ) {
 
-            function onCentralRepulsion( value ) {
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setCentralAttraction( value );
+                    }
 
-                for ( var i = 0; i < centerAttractions.length; i++ ) {
-                    centerAttractions[i].strength = value;
                 }
 
-            }
+                function onMouseAttraction( value ) {
 
-            function onGravity( value ) {
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setMouseAttraction( value );
+                    }
 
-                physics.gravity.z = value;
-
-            }
-
-            function onMouseAttraction( value ) {
-
-                for ( var i = 0; i < mouseAttractions.length; i++ ) {
-                    mouseAttractions[i].strength = value;
                 }
 
-            }
+                function onSpringStrengthInteractive( value ) {
 
-            function onBackgroundDarkness( value ) {
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setSpringStrengthInteractive( value );
+                    }
 
-                var color = new THREE.Color( 0xF2F3F4 ).lerp ( new THREE.Color( 0.12,0.11,0.15 ), value )
-                renderer.setClearColor( color.getHex() );
+                }
+
+                function onSpringLengthInteractive( value ) {
+
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setSpringLengthInteractive( value );
+                    }
+
+                }
+
+                function onAttractionStrengthInteractive( value ) {
+
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        clusters[ i ].setAttractionStrengthInteractive( value );
+                    }
+
+                }
+
+                function onGravity( value ) {
+
+                    physics.gravity.z = value;
+
+                }
+
+                function onBackgroundDarkness( value ) {
+
+                    var color = new THREE.Color( 0xF2F3F4 ).lerp ( new THREE.Color( 0.12,0.11,0.15 ), value )
+                    renderer.setClearColor( color.getHex() );
+
+                }
+
 
             }
 

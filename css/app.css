@@ -4,6 +4,7 @@
  * 2. Prevent iOS text size adjust after orientation change, without disabling
  *    user zoom.
  */
+@import url(https://fonts.googleapis.com/css?family=Shadows+Into+Light);
 html {
   font-family: sans-serif;
   /* 1 */
@@ -356,13 +357,108 @@ td,
 th {
   padding: 0; }
 
+@font-face {
+  font-family: 'PFDinTextPro-ExtraBlack';
+  src: url("../font/294CD0_0_0.eot");
+  src: url("../font/294CD0_0_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_0_0.woff") format("woff"), url("../font/294CD0_0_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-ExtraBlackItalic';
+  src: url("../font/294CD0_1_0.eot");
+  src: url("../font/294CD0_1_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_1_0.woff") format("woff"), url("../font/294CD0_1_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Regular';
+  src: url("../font/294CD0_2_0.eot");
+  src: url("../font/294CD0_2_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_2_0.woff") format("woff"), url("../font/294CD0_2_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Medium';
+  src: url("../font/294CD0_3_0.eot");
+  src: url("../font/294CD0_3_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_3_0.woff") format("woff"), url("../font/294CD0_3_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-BoldItalic';
+  src: url("../font/294CD0_4_0.eot");
+  src: url("../font/294CD0_4_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_4_0.woff") format("woff"), url("../font/294CD0_4_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-MediumItalic';
+  src: url("../font/294CD0_5_0.eot");
+  src: url("../font/294CD0_5_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_5_0.woff") format("woff"), url("../font/294CD0_5_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Italic';
+  src: url("../font/294CD0_6_0.eot");
+  src: url("../font/294CD0_6_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_6_0.woff") format("woff"), url("../font/294CD0_6_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Bold';
+  src: url("../font/294CD0_7_0.eot");
+  src: url("../font/294CD0_7_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_7_0.woff") format("woff"), url("../font/294CD0_7_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Thin';
+  src: url("../font/294CD0_8_0.eot");
+  src: url("../font/294CD0_8_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_8_0.woff") format("woff"), url("../font/294CD0_8_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Light';
+  src: url("../font/294CD0_9_0.eot");
+  src: url("../font/294CD0_9_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_9_0.woff") format("woff"), url("../font/294CD0_9_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-ExtraThin';
+  src: url("../font/294CD0_A_0.eot");
+  src: url("../font/294CD0_A_0.eot?#iefix") format("embedded-opentype"), url("../font/294CD0_A_0.woff") format("woff"), url("../font/294CD0_A_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-ThinItalic';
+  src: url("../font/294CD0_B_0.eot");
+  src: url("webfonts/294CD0_B_0.eot?#iefix") format("embedded-opentype"), url("webfonts/294CD0_B_0.woff") format("woff"), url("webfonts/294CD0_B_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-ExtraThinItalic';
+  src: url("webfonts/294CD0_C_0.eot");
+  src: url("webfonts/294CD0_C_0.eot?#iefix") format("embedded-opentype"), url("webfonts/294CD0_C_0.woff") format("woff"), url("webfonts/294CD0_C_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-LightItalic';
+  src: url("webfonts/294CD0_D_0.eot");
+  src: url("webfonts/294CD0_D_0.eot?#iefix") format("embedded-opentype"), url("webfonts/294CD0_D_0.woff") format("woff"), url("webfonts/294CD0_D_0.ttf") format("truetype"); }
+@font-face {
+  font-family: 'PFDinTextPro-Hairline';
+  src: url("webfonts/294CD0_E_0.eot");
+  src: url("webfonts/294CD0_E_0.eot?#iefix") format("embedded-opentype"), url("webfonts/294CD0_E_0.woff") format("woff"), url("webfonts/294CD0_E_0.ttf") format("truetype"); }
 body {
   overflow: hidden; }
 
+#layer-nodes,
 #layer-gl {
   position: absolute;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  top: 0;
+  right: 0; }
+
+#layer-nodes {
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  -o-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0); }
+
+.node {
+  position: absolute; }
+  .node .circle {
+    position: relative;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    margin-top: -50%;
+    margin-left: 50%;
+    opacity: 0.8;
+    transition: all 300ms; }
+  .node:hover .circle {
+    opacity: 1.0;
+    -ms-transform: scale(2.5);
+    -webkit-transform: scale(2.5);
+    transform: scale(2.5); }
+
+#logo {
+  position: absolute;
+  width: 130px;
+  height: 69px;
+  background: url("../assets/logo.png") no-repeat;
+  background-size: 100%;
+  margin: 15px; }
 
 #title {
   position: absolute;
@@ -374,5 +470,32 @@ body {
 canvas {
   width: 100%;
   height: 100%; }
+
+#bottom-bar {
+  height: 60px;
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  cursor: pointer; }
+  #bottom-bar .button {
+    box-sizing: border-box;
+    margin: 0px;
+    border-top: 5px solid #F39C12;
+    float: left;
+    width: 16.6666%;
+    padding: 7px 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: background-color 400ms ease-in-out, color 400ms ease-in-out; }
+    #bottom-bar .button .title {
+      font-size: 18px;
+      line-height: 20px;
+      text-transform: uppercase;
+      font-weight: bold; }
+    #bottom-bar .button .subtitle {
+      font-size: 13px;
+      line-height: 20px; }
+    #bottom-bar .button:hover, #bottom-bar .button.active {
+      color: #ffffff; }
 
 /*# sourceMappingURL=app.css.map */

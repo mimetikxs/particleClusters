@@ -7,11 +7,17 @@ APP.Attraction = function(a, b, strength) {
     this.dist = 0;           // current distance between particles
     this.distMin = 0;       // force will stop growing when distance < minDist
     this.distMax = 1000;     // force will be 0 if distance is greather than this value
+
+    this.enabled = true;
 }
 
 APP.Attraction.prototype = {
 
     update : function() {
+
+        if ( !this.enabled ) {
+            return;
+        }
 
         // 3d attraction
         // var delta = this.b.pos.clone().sub( this.a.pos );
