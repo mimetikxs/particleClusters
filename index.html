@@ -68,7 +68,6 @@
         <script src="lib/jquery-1.12.0.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
 		<script src="lib/three.min.js"></script>
-        <script src="lib/Stats.js"></script>
         <script src="lib/dat.gui.min.js"></script>
 
         <script src="src/App.js"></script>
@@ -78,9 +77,9 @@
         <script src="src/SpringMinDist.js"></script>
         <script src="src/Attraction.js"></script>
         <script src="src/Physics.js"></script>
-        <script src="src/Noise.js"></script>
         <script src="src/Walker2.js"></script>
         <script src="src/Cluster.js"></script>
+        <script src="src/StateDefault.js"></script>
 
 
         <script type="x-shader/x-vertex" id="vertexshader">
@@ -133,38 +132,28 @@
 
         <script>
 
+            var sceneWidth, sceneHeight,
+                backgroundColor;
+
             // render 3D
             var scene, camera, renderer,
-                sprite, sprite2,
                 materialPoints, materialLines;
-
-            // render DOM
-            var nodes = [];
 
             // physics model
             var physics,
                 clusters = [],
-                mouseParticle,
-                clusterParticles = 50,
+                mouseParticle;
 
-                clusterPositions; // TODO: create data object
-
-            var sceneWidth, sceneHeight,
-
-                backgroundColor,
-
-                //stats,
-                gui;
-
+            // dom
+            var $bottomBar = $( '#bottom-bar' );
 
             // TODO:
             // states
             var currentState; // state_ClustersAll, state_ClusterFilter, state_NodeView, state_VideoView
-
-            var activeCluster, activeNode; // TODO: move to state
-
-            //TODO: use states to avoid flags
+            var categoryIndex, nodeIndex;
             var useMouseInteraction = true;
+
+            var gui;
 
 
             init();
@@ -196,12 +185,27 @@
 
                 initMaterials();
                 initPhysics();
-                buildClusters();
+                buildClusters( APP.data );
+                buildBar( APP.data );
 
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
                 window.addEventListener( 'resize', onWindowResize, false );
 
                 onWindowResize();
+
+                setState( new APP.StateDefault( this, -1 ) );
+
+            }
+
+
+            function setState( newState ) {
+
+                if ( currentState ) {
+                    currentState.exit();
+                }
+
+                currentState = newState;
+                currentState.enter();
 
             }
 
@@ -210,45 +214,9 @@
 
                 requestAnimationFrame( animate );
 
-                //stats.begin();
-
-                physics.update();
-
-                // clusters
-                for ( var i = 0; i < clusters.length; i++ ) {
-                    clusters[ i ].update();
-                }
-
-                updateMouseInteraction();
-
-                // nodes
-
-                // var projScreenMat = new THREE.Matrix4();
-                // projScreenMat.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-                for ( var i = 0; i < nodes.length; i++ ) {
-                    var $node = nodes[ i ],
-                        particle = $node.data("particle"),
-                        screenPos = particle.pos.clone();
-
-                        // transform
-                        screenPos.x = sceneWidth - (screenPos.x + sceneWidth/2);
-        				screenPos.y = sceneHeight/2 - screenPos.y;
-                        // screenPos.applyMatrix4( projScreenMat );	           // NDC (-1.0..1.0)
-        				// screenPos.x = ( - screenPos.x + 1 ) * sceneWidth/2;    // viewport transform
-        		        // screenPos.y = ( - screenPos.y + 1 ) * sceneHeight/2;
-
-
-                    $node.css({
-                        right : screenPos.x,
-                        top : screenPos.y
-                    });
-
-                }
+                currentState.update();
 
                 renderer.render( scene, camera );
-
-                //stats.end();
 
             }
 
@@ -289,180 +257,61 @@
             }
 
 
-            function buildClusters() {
+            function buildClusters( data ) {
 
-                for (var i = 0; i < APP.data.length; i++) {
-                    var clusterData = APP.data[ i ];
+                for (var i = 0; i < data.length; i++) {
+                    var clusterData = data[ i ];
                     var pos = clusterData.position.clone();
                     pos.x *= sceneWidth/2;
                     pos.y *= sceneHeight/2;
                     var numParticles = 20 + Math.random() * 10; // number of background particles
 
                     var cluster = new APP.Cluster( mouseParticle, materialPoints, materialLines );
-                    cluster.setup( clusterData, numParticles, pos );
+                    cluster.setup( i, clusterData, numParticles, pos );
                     cluster.addToPhysics( physics );
                     cluster.addToScene( scene );
+                    cluster.addToDom( $('#layer-nodes') );
 
                     clusters.push( cluster );
                 }
 
-                // interactive nodes
+            }
 
-                var $layer = $('#layer-nodes'),
-                    i, j,
-                    clusterData,
-                    cluster,
-                    particles,
-                    node,
-                    size,
-                    clusterColor = new THREE.Color();
 
-                for ( i = 0; i < APP.data.length; i++ ) {
-                    clusterData = APP.data[ i ],
-                    cluster = clusters[ i ],
+            function buildBar( data ){
 
-                    particles = cluster.interactiveParticles;
+                var clusterColor = new THREE.Color(),
+                    clusterColorString;
 
-                    clusterColor.setHex( clusterData.color );
-
-                    for ( j = 0; j < particles.length; j++ ) {
-                        particle = particles[ j ];
-
-                        size = particle.data.size;
-
-                        $node = $( APP.templates.nodeTemplate );
-                        $node.data( 'particle', particle );
-                        $node.find('.circle').css({
-                            'background-color' : '#' + clusterColor.getHexString(),
-                            'width': size,
-                            'height': size
-                        });
-
-                        nodes.push( $node );
-
-                        $layer.append( $node );
-                    }
-                }
-
-                // buttons
-                var $bottomBar = $( '#bottom-bar' ),
-                    r, g, b, a,
-                    rgba;
-
-                for ( i = 0; i < APP.data.length; i++ ) {
-                    clusterData = APP.data[ i ];
+                for ( i = 0; i < data.length; i++ ) {
+                    clusterData = data[ i ];
                     cluster = clusters[ i ];
+
                     clusterColor.setHex( clusterData.color );
+                    clusterColorString = getColorString( clusterColor, 0.5 );
 
-                    r = clusterColor.r * 255;
-                    g = clusterColor.g * 255;
-                    b = clusterColor.b * 255;
-                    a = 0.5;
-                    rgba = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-
-                    $bottomBar
-                        .find( '#' + clusterData.slug )
+                    $bottomBar.find( '#' + clusterData.slug )
                         .css( 'border-top-color', '#' + clusterColor.getHexString() )
-                        .data( 'cluster', cluster )
-                        .data( 'color', rgba )
+                        .data( 'categoryIndex', i )
+                        .data( 'color', clusterColorString );
                 }
 
-                clusterColor.setHex( '#777777' );
-                r = clusterColor.r * 255;
-                g = clusterColor.g * 255;
-                b = clusterColor.b * 255;
-                a = 0.5;
-                rgba = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+                clusterColor.setHex( 0x777777 );
+                clusterColorString = getColorString( clusterColor, 0.5 );
 
-                $bottomBar
-                    .find( '#category-0' )
+                $bottomBar.find( '#category-0' )
                     .css( 'border-top-color', '#777777' )
-                    .data( 'color', rgba );
+                    .data( 'categoryIndex', -1 )
+                    .data( 'color', clusterColorString );
 
-
-                $bottomBar
-                    .on( 'click', '.button', function() {
-                        $bottomBar.find('.active')
-                            .removeClass( 'active' )
-                            .css( 'background-color', '' );
-
-                        $( this )
-                            .addClass( 'active' )
-                            .css( 'background-color', $( this ).data( 'color' ) );
-
-                        selectCluster( $( this ).data( 'cluster' ) );
-                    })
-                    .on( 'mouseenter', '.button', function() {
-                        $( this ).css( 'background-color', $( this ).data( 'color' ) );
-                    })
-                    .on( 'mouseleave', '.button', function() {
-                        if ( !$( this ).hasClass( 'active' ) ){
-                            $( this ).css( 'background-color', '' );
-                        }
-                    });
-
-                // TODO: fix
-                var $all = $bottomBar.find( '#category-0' )
-                $all
-                    .addClass( 'active' )
-                    .css( 'background-color', $all.data( 'color' ) );
-            }
-
-
-            function selectCluster( newCluster ) {
-
-                // filter off
-
-                if ( newCluster === undefined ){
-
-                    physics.gravity.z = APP.parameters.gravity;
-
-                    for ( var i = 0; i < clusters.length; i++ ) {
-                        setClusterState( clusters[ i ], APP.clusterStates.default );
-                    }
-
-                    activeCluster = newCluster;
-
-                    useMouseInteraction = true;
-
-                    return; // stop here
+                function getColorString( color, alpha ) {
+                    var c = color.clone(),
+                        r = c.r * 255,
+                        g = c.g * 255,
+                        b = c.b * 255,
+                        a = alpha;
+                    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
                 }
-
-                // filter on
-
-                if ( newCluster === activeCluster ) {
-                    return;
-                }
-
-                // test
-                physics.gravity.z = 3.21;
-
-                for ( var i = 0; i < clusters.length; i++ ) {
-                    var cluster = clusters[i];
-                    if ( cluster === newCluster ) {
-                        setClusterState( cluster, APP.clusterStates.opened );
-
-                    } else {
-                        setClusterState( cluster, APP.clusterStates.closed );
-                    }
-                }
-
-                activeCluster = newCluster;
-
-                useMouseInteraction = false;
-
-            }
-
-
-            function setClusterState( cluster, state ) {
-
-                cluster.setClusterRadius( state['cluster_radius'] );
-                cluster.setSurfaceStrength( state['surface_strength'] );
-                cluster.setCentralAttraction( state['central_attraction'] );
-                cluster.setMouseAttraction( state['mouse_attraction'] );
-                cluster.setSpringStrengthInteractive( state['spring_strength_interactive'] );
-                cluster.setSpringLengthInteractive( state['spring_length_interactive'] );
-                cluster.setAttractionStrengthInteractive( state['attraction_strength_interactive'] );
 
             }
 
@@ -499,35 +348,6 @@
                 }
 
                 renderer.setSize( sceneWidth, sceneHeight );
-
-            }
-
-
-            function updateMouseInteraction() {
-
-                for ( var i = 0; i < clusters.length; i++ ) {
-                    var cluster = clusters[ i ];
-
-                    var delta = new THREE.Vector3();
-                        delta.subVectors( mouseParticle.pos, cluster.centralParticle.pos );
-
-                    var distance = delta.length(),
-                        numMouseAttractions = cluster.mouseAttractions.length,
-                        enabled = (distance < cluster.limitDistance) ? true : false;
-
-                    // enable / disable mouse attractions
-                    for ( var j = 0; j < numMouseAttractions; j++ ) {
-                        cluster.mouseAttractions[ j ].enabled = enabled;
-                    }
-
-                    if ( useMouseInteraction ) {
-                        // strength of attraction relative to mouse distance to center
-                        distance = (distance < cluster.limitDistance) ? distance : cluster.limitDistance;
-                        var attractionStrength = (distance / cluster.limitDistance) * 100;
-
-                        cluster.setCentralAttraction( attractionStrength );
-                    }
-                }
 
             }
 
@@ -629,8 +449,8 @@
 
                 }
 
-
             }
+
 
         </script>
 

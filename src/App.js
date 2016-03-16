@@ -4,30 +4,35 @@ var APP = APP || {};
 
 APP.parameters = {
 
+    // cluster parameters
     cluster_radius:       220.0,
     surface_strength:     0.0037,
     central_attraction:   91.0,
     mouse_attraction:     -14.0,
-
     spring_strength_interactive:     0.022,
     spring_length_interactive:       163,
     attraction_strength_interactive: 16,
-
+    // global parameters
     gravity:              0.75,
     background_darkness:  0.0
 
 };
 
-APP.clusterStates = {
+APP.clusterParameters = {
 
     default : {
+        //normal nodes
         cluster_radius:       220.0,
         surface_strength:     0.0037,
         central_attraction:   91.0,
         mouse_attraction:     -14.0,
+        // interactive nodes
         spring_strength_interactive:     0.022,
         spring_length_interactive:       163,
         attraction_strength_interactive: 16,
+        // flags
+        interactive_enabled:        true,
+        mouse_attraction_enabled:   true
     },
 
     opened : {
@@ -38,6 +43,8 @@ APP.clusterStates = {
         spring_strength_interactive:     0.052,
         spring_length_interactive:       126,
         attraction_strength_interactive: 136,
+        interactive_enabled:        true,
+        mouse_attraction_enabled:   true
     },
 
     closed : {
@@ -48,6 +55,8 @@ APP.clusterStates = {
         spring_strength_interactive:     0,
         spring_length_interactive:       0,
         attraction_strength_interactive: 345,
+        interactive_enabled:        false,
+        mouse_attraction_enabled:   true
     }
 
 }
@@ -79,16 +88,28 @@ APP.data = [
             {
                 url: 'url1',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-1',
                 size: 35
             },
             {
                 url: 'url2',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-2',
                 size: 30
             },
             {
                 url: 'url3',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-3',
                 size: 35
             }
         ]
@@ -103,26 +124,46 @@ APP.data = [
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-1',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-2',
                 size: 30
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-3',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-4',
                 size: 28
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-5',
                 size: 30
             }
         ]
@@ -137,21 +178,37 @@ APP.data = [
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-1',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-2',
                 size: 30
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-3',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-4',
                 size: 28
             }
         ]
@@ -166,21 +223,37 @@ APP.data = [
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-1',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-2',
                 size: 30
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-3',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-4',
                 size: 28
             }
         ]
@@ -195,26 +268,46 @@ APP.data = [
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-1',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-2',
                 size: 30
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-3',
                 size: 35
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-4',
                 size: 28
             },
             {
                 url: 'url',
                 cover: 'url',
+                title: '',
+                subtitle: '',
+                description: '',
+                slug: 'video-5',
                 size: 30
             }
         ]

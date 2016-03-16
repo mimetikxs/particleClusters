@@ -1,6 +1,19 @@
 APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
 
-    // physics ------------
+    // parameters ----------
+
+    this.clusterRadius = APP.parameters.cluster_radius;
+    this.surfaceStrength = APP.parameters.surface_strength;
+    this.centralAttraction = APP.parameters.centralAttraction;
+    this.mouseAttraction = APP.parameters.mouse_attraction;
+    this.springStrengthInteractive = APP.parameters.spring_strength_interactive;
+    this.springLengthInteractive = APP.parameters.spring_length_interactive;
+    this.attractionStrengthInteractive = APP.parameters.attraction_strength_interactive;
+
+    this.mouseAttractionEnabled = false;
+    this.interactiveEnabled = true;
+
+    // physics ---------------
 
     this.centralParticle;
     this.mouseParticle = mouseParticle;
@@ -10,28 +23,12 @@ APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
     this.mouseAttractions = [];
     this.sphereConstraint;
     this.walkers = [];
-    // interactive
     this.interactiveParticles = [];
     this.interactiveSprings = [];       // springs between interactive particles
     this.interactiveSprings2 = [];      // springs from interactive to normal particles
     this.interactiveAttractions = [];
 
-    this.clusterRadius = APP.parameters.cluster_radius;
-    this.surfaceStrength = APP.parameters.surface_strength;
-    this.centralAttraction = APP.parameters.centralAttraction;
-    this.mouseAttraction = APP.parameters.mouse_attraction;
-    // interactive
-    this.springStrengthInteractive = APP.parameters.spring_strength_interactive;
-    this.springLengthInteractive = APP.parameters.spring_length_interactive;
-    this.attractionStrengthInteractive = APP.parameters.attraction_strength_interactive;
-
-    // mouse interaction
-    // TODO: move outside
-    this.isMouseEnabled = false;
-    this.limitDistance = this.clusterRadius + (this.clusterRadius * 0.2); // 20% of margin
-    this.limitDistanceSq = this.limitDistanceSq * this.limitDistanceSq;
-
-    // rendering ----------
+    // rendering 3D -----------
 
     this.points;
     this.geometryPoints;
@@ -41,13 +38,25 @@ APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
     this.materialLines = materialLines;
     this.walkerPoints; // debug
 
+    // rendering DOM ----------
+
+    this.$nodes = [];
+
+    // data -------------------
+
+    // the index of the cluster in the application's array of clusters
+    // this relates clusters with data (eg: app.clusters[ index ] --> app.data[ index ]  )
+    this.index;
+
 }
 
 
 APP.Cluster.prototype = {
 
 
-    setup : function( data, numParticles, position ) {
+    setup : function( index, data, numParticles, position ) {
+
+        this.index = index;
 
         // init central particle
         this.centralParticle = new APP.Particle(position.x, position.y, 0);
@@ -56,8 +65,9 @@ APP.Cluster.prototype = {
         this.sphereConstraint = new APP.Constraint( this.centralParticle.pos, this.clusterRadius );
 
         this.buildPhysics( numParticles );
-        this.buildPhysicsInteractive( data.videos );
+        this.buildPhysicsInteractive( data );
         this.build3DObjects();
+        this.buildDomObjects( data )
 
     },
 
@@ -74,9 +84,6 @@ APP.Cluster.prototype = {
         this.clusterRadius = value;
 
         this.sphereConstraint.radius = value;
-
-        this.limitDistance = value + (value * 0.2); // 20% of margin
-        this.limitDistanceSq = this.limitDistance * this.limitDistance;
 
         for ( var i = 0; i < this.surfaceSprings.length; i++ ) {
             this.surfaceSprings[i].setLength( value );
@@ -234,12 +241,10 @@ APP.Cluster.prototype = {
 
     update : function() {
 
-        // update vertices from particles
-
+        // vertex positions
         var numParticles = this.particles.length,
             positions = this.geometryPoints.getAttribute('position').array,
             particle;
-
         for ( var i = 0, i3 = 0; i < numParticles; i ++, i3 += 3 ) {
             particle = this.particles[ i ].pos;
 
@@ -247,16 +252,26 @@ APP.Cluster.prototype = {
             positions[ i3 + 1 ] = particle.y;
             positions[ i3 + 2 ] = particle.z;
         }
-
         this.geometryPoints.getAttribute('position').needsUpdate = true;
-
         this.geometryLines.verticesNeedUpdate = true;
 
-        // walkers
+        // walkers positions
         for (var i = 0; i < this.walkers.length; i++) {
             this.walkers[ i ].update();
         }
         this.walkerPoints.geometry.verticesNeedUpdate = true;
+
+        // dom nodes position
+        var numNodes = this.$nodes.length;
+        for ( var i = 0; i < numNodes; i++ ) {
+            var $node = this.$nodes[ i ],
+                particle = this.interactiveParticles[ i ],
+                screenPos = particle.pos.clone();
+                screenPos.x = screenPos.x + sceneWidth/2;
+                screenPos.y = sceneHeight/2 - screenPos.y;
+
+            $node.css('transform', 'translate3d(' + screenPos.x  + 'px,' + screenPos.y + 'px,0px)');
+        }
 
     },
 
@@ -364,15 +379,14 @@ APP.Cluster.prototype = {
                 attraction;
 
             // particles
-            for ( i = 0; i < data.length; i++ ) {
-                var videoData = data[ i ];
+            for ( i = 0; i < data.videos.length; i++ ) {
+                var videoData = data.videos[ i ];
 
                 var x = Math.random() * (spanRadius*2) - spanRadius,
                     y = Math.random() * (spanRadius*2) - spanRadius,
                     z = Math.random() * spanRadius;
 
                 particle = new APP.Particle( x, y, z );
-                particle.data = videoData;
                 particle.constraints.push( self.sphereConstraint );
 
                 self.interactiveParticles.push( particle );
@@ -443,7 +457,6 @@ APP.Cluster.prototype = {
             var numParticles = self.particles.length,
 
                 style_colors = [ 0xF39C12, 0xE74C3C, 0x8E44AD, 0x3498DB, 0x1ABC9C ],
-                //style_sizes = [ 25, 18, 15, 12, 6 ],
                 style_sizes = [ 18, 15, 12, 6 ],
 
                 positions = new Float32Array( numParticles * 3 ),
@@ -456,7 +469,6 @@ APP.Cluster.prototype = {
 
 			for ( var i = 0, i3 = 0; i < numParticles; i ++, i3 += 3 ) {
 
-                // randomIndex = Math.floor( Math.random() * style_colors.length );
                 rand = Math.random();
                 randomIndex = (rand <= 0.2) ? 0 :
                               (rand > 0.2 && rand <= 0.5) ? 1 :
@@ -469,7 +481,6 @@ APP.Cluster.prototype = {
 				colors[ i3 + 1 ] = color.g;
 				colors[ i3 + 2 ] = color.b;
 
-                //randomIndex = Math.floor( Math.random() * style_colors.length );
                 rand = Math.random();
                 randomIndex = (rand <= 0.2) ? 0 :
                               (rand > 0.2 && rand <= 0.3) ? 1 :
@@ -492,7 +503,8 @@ APP.Cluster.prototype = {
 
             self.points = new THREE.Points( self.geometryPoints, self.materialPoints );
 
-
+            // TODO:
+            // include interactive particles to be rendered by shader material
             // debug
 
             var geom,
@@ -506,7 +518,6 @@ APP.Cluster.prototype = {
             //
             // }
             // self.walkerPoints = new THREE.Points( geom, material );
-
 
             // debug
 
@@ -531,6 +542,99 @@ APP.Cluster.prototype = {
 
         }
 
+    },
+
+
+    buildDomObjects : function( clusterData ) {
+
+        var i, $node, nodeData,
+            color = new THREE.Color().setHex( clusterData.color ),
+            category = clusterData.slug;
+
+        for ( i = 0; i < clusterData.videos.length; i++ ) {
+            nodeData = clusterData.videos[ i ];
+            $node = $( APP.templates.nodeTemplate );
+            $node
+                .data( 'nodeData', {
+                    'id':          i,
+                    'video':       nodeData.url,
+                    'cover':       nodeData.cover,
+                    'title':       nodeData.title,
+                    'subtitle':    nodeData.subtitle,
+                    'description': nodeData.description
+                })
+                .addClass( 'enabled' )
+                //.attr( 'id', category + '-' + nodeData.slug )
+                .find( '.circle' ).css({
+                    'background-color': '#' + color.getHexString(),
+                    'width':  nodeData.size,
+                    'height': nodeData.size
+                });
+
+            this.$nodes.push( $node );
+        }
+    },
+
+
+    setState : function( state ) {
+
+        this.setClusterRadius( state['cluster_radius'] );
+        this.setSurfaceStrength( state['surface_strength'] );
+        this.setCentralAttraction( state['central_attraction'] );
+        this.setMouseAttraction( state['mouse_attraction'] );
+        this.setSpringStrengthInteractive( state['spring_strength_interactive'] );
+        this.setSpringLengthInteractive( state['spring_length_interactive'] );
+        this.setAttractionStrengthInteractive( state['attraction_strength_interactive'] );
+        this.setMouseAttractionEnabled( state['mouse_attraction_enabled'] );
+        this.setInteractiveEnabled( state['interactive_enabled'] );
+
+    },
+
+
+    setMouseAttractionEnabled: function( enabled ) {
+
+        if ( enabled  === this.mouseAttractionEnabled ){
+            return;
+        }
+
+        this.mouseAttractionEnabled = enabled;
+
+        var numMouseAttractions = this.mouseAttractions.length;
+        for ( var i = 0; i < numMouseAttractions; i++ ) {
+            this.mouseAttractions[ i ].enabled = enabled;
+        }
+
+    },
+
+
+    setInteractiveEnabled: function( enabled ) {
+
+        if ( enabled  === this.interactiveEnabled ){
+            return;
+        }
+
+        this.interactiveEnabled = enabled;
+
+        if ( enabled ) {
+            for ( var i = 0; i < this.$nodes.length; i++ ) {
+                this.$nodes[ i ].addClass( 'enabled' );
+            }
+        } else {
+            for ( var i = 0; i < this.$nodes.length; i++ ) {
+                this.$nodes[ i ].removeClass( 'enabled' );
+            }
+        }
+
+    },
+
+
+    addToDom : function( $container ) {
+
+        for ( var i = 0; i < this.$nodes.length; i++ ) {
+            $container.append( this.$nodes[ i ] );
+        }
+
     }
+
 
 }

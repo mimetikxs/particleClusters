@@ -428,13 +428,6 @@ body {
   top: 0;
   right: 0; }
 
-#layer-nodes {
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
-  -ms-transform: translate3d(0, 0, 0);
-  -o-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0); }
-
 .node {
   position: absolute; }
   .node .circle {
@@ -443,10 +436,10 @@ body {
     -webkit-border-radius: 50%;
     border-radius: 50%;
     margin-top: -50%;
-    margin-left: 50%;
+    margin-left: -50%;
     opacity: 0.8;
     transition: all 300ms; }
-  .node:hover .circle {
+  .node.enabled:hover .circle {
     opacity: 1.0;
     -ms-transform: scale(2.5);
     -webkit-transform: scale(2.5);
@@ -477,7 +470,12 @@ canvas {
   position: fixed;
   bottom: 0px;
   left: 0px;
-  cursor: pointer; }
+  cursor: pointer;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
   #bottom-bar .button {
     box-sizing: border-box;
     margin: 0px;

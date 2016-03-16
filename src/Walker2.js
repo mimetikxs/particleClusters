@@ -1,7 +1,5 @@
 APP.Walker = function( speed ) {
 
-    this.noise = new APP.Simple1DNoise();
-
     this.particle = new APP.Particle(0, 0, 0);
     this.particle.isFixed = true;
 
