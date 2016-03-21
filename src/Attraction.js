@@ -9,6 +9,7 @@ APP.Attraction = function(a, b, strength) {
     this.distMax = 1000;     // force will be 0 if distance is greather than this value
 
     this.enabled = true;
+    
 }
 
 APP.Attraction.prototype = {

@@ -12,6 +12,17 @@
 
         <div id="logo"></div>
 
+        <div id="box-info">
+            <div class="image"></div>
+            <div class="info">
+                <div class="title">Video title goes here</div>
+                <div class="subtitle">This is the subtitle</div>
+                <div class="description">bla bla bla</div>
+            </div>
+            <div class="button-play">play video</div>
+            <div class="button-close">×</div>
+        </div>
+
         <div id="bottom-bar">
             <div class="button" id="category-0">
                 <div class="title">
@@ -63,7 +74,6 @@
             </div>
         </div>
 
-        <!-- <p id="title">PARTICLE CLUSTER EDITOR</p> -->
 
         <script src="lib/jquery-1.12.0.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
@@ -76,10 +86,12 @@
         <script src="src/Spring.js"></script>
         <script src="src/SpringMinDist.js"></script>
         <script src="src/Attraction.js"></script>
+        <script src="src/AttractionDirectional.js"></script>
         <script src="src/Physics.js"></script>
         <script src="src/Walker2.js"></script>
         <script src="src/Cluster.js"></script>
         <script src="src/StateDefault.js"></script>
+        <script src="src/StateNodeInfo.js"></script>
 
 
         <script type="x-shader/x-vertex" id="vertexshader">
@@ -106,7 +118,6 @@
 
 		</script>
 
-
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform sampler2D texture;
@@ -129,31 +140,85 @@
 
 		</script>
 
+        <script type="x-shader/x-vertex" id="vertexshaderLines">
+
+            attribute vec3 customColor;
+            attribute float opacity;
+
+            varying vec3 vColor;
+            varying float vOpacity;
+
+			void main() {
+
+				vColor = customColor;
+                vOpacity = opacity;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshaderLines">
+
+			varying vec3 vColor;
+            varying float vOpacity;
+
+			void main() {
+
+				gl_FragColor = vec4( vColor, vOpacity );
+
+			}
+
+		</script>
+
 
         <script>
 
-            var sceneWidth, sceneHeight,
-                backgroundColor;
+            var sceneWidth, sceneHeight;
 
             // render 3D
             var scene, camera, renderer,
-                materialPoints, materialLines;
+                materialPoints, materialLines, materialInteractiveParticles;
 
             // physics model
             var physics,
+                mouseParticle,
                 clusters = [],
-                mouseParticle;
+                interClusterSprings = [],
+                topEdgePos, bottomEdgePos, leftEdgePos, rightEdgePos,
+                edgeRepulsions = [];
+
+            //testing inter node lines
+            var materialLines2,
+                geometryLines,           // lines between nodes
+                interNodeSprings = [],   // all the springs connecting nodes (interClusterSprings + node.interactiveSprings)
+                lineOpacityThreshold = APP.parameters.line_opacity_threshold;
 
             // dom
-            var $bottomBar = $( '#bottom-bar' );
+            var $layerGl = $('#layer-gl'),
+                $layerNodes = $('#layer-nodes'),
+                $bottomBar = $( '#bottom-bar' ),
+                $boxInfo = $( '#box-info' );
 
-            // TODO:
-            // states
-            var currentState; // state_ClustersAll, state_ClusterFilter, state_NodeView, state_VideoView
+            // state machine
+            var currentState;
+            var filterCategoryIndex;
             var categoryIndex, nodeIndex;
             var useMouseInteraction = true;
 
             var gui;
+
+            // color theme interpolation
+            var colorLerpPct = 1,
+                colorLerpSpeed = 0.01,
+                themeStart,
+                themeEnd,
+                backgroundColor = APP.theme.light.backgroundColor.clone(),
+                bottomBarColor = APP.theme.light.bottomBarColor.clone(),
+                nodesColor = APP.theme.light.nodesColor.clone();
 
 
             init();
@@ -162,10 +227,8 @@
 
             function init() {
 
-                var $holder = $('#layer-gl');
-
-                sceneWidth = $holder.width();
-                sceneHeight = $holder.height();
+                sceneWidth = $layerGl.width();
+                sceneHeight = $layerGl.height();
 
                 backgroundColor = new THREE.Color( 0xF2F3F4 );
 
@@ -179,14 +242,17 @@
                 renderer.setSize( sceneWidth, sceneHeight );
                 renderer.setClearColor( backgroundColor.getHex() );
 
-		        $holder.append( $(renderer.domElement) );
+		        $layerGl.append( $(renderer.domElement) );
 
-                //buildGui();
+                buildGui();
 
                 initMaterials();
                 initPhysics();
                 buildClusters( APP.data );
-                buildBar( APP.data );
+                buildInterClusterSprings();
+                buildLinesBetweenNodes();
+                buildEdgeRepulsions();
+                buildBottomBar( APP.data );
 
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -215,6 +281,8 @@
                 requestAnimationFrame( animate );
 
                 currentState.update();
+
+                updateLinesBetweenNodes();
 
                 renderer.render( scene, camera );
 
@@ -251,8 +319,26 @@
                     alphaTest:       0.5
     			});
 
-                materialLines = new THREE.LineBasicMaterial( { color: 0xdddddd, linewidth: 1, transparent: true, opacity: 0.2, depthTest: false } );
-                materialLines.visible = false;
+                materialLines = new THREE.LineBasicMaterial( { color: 0x999999, linewidth: 1, transparent: true, opacity: 0.2, depthTest: false } );
+                //materialLines.visible = true;
+
+                materialLines2 = new THREE.ShaderMaterial( {
+    				vertexShader: document.getElementById( 'vertexshaderLines' ).textContent,
+    				fragmentShader: document.getElementById( 'fragmentshaderLines' ).textContent,
+
+    				depthTest:       false,
+    				transparent:     true,
+                    // alphaTest:       0.5
+    			});
+
+                materialInteractiveParticles = new THREE.PointsMaterial({
+                    size: 15,
+                    color: 0x000000,
+                    sizeAttenuation: false,
+                    map: new THREE.TextureLoader().load( "assets/circle-marked.png" ),
+                    alphaTest: 0.5,
+                    transparent: true
+                });
 
             }
 
@@ -266,7 +352,7 @@
                     pos.y *= sceneHeight/2;
                     var numParticles = 20 + Math.random() * 10; // number of background particles
 
-                    var cluster = new APP.Cluster( mouseParticle, materialPoints, materialLines );
+                    var cluster = new APP.Cluster( mouseParticle, materialPoints, materialLines, materialInteractiveParticles );
                     cluster.setup( i, clusterData, numParticles, pos );
                     cluster.addToPhysics( physics );
                     cluster.addToScene( scene );
@@ -278,7 +364,190 @@
             }
 
 
-            function buildBar( data ){
+            function buildEdgeRepulsions() {
+
+                topEdgePos = new THREE.Vector2( 0, -sceneHeight/2 );
+                bottomEdgePos = new THREE.Vector2( 0, -sceneHeight/2 + 70);
+                leftEdgePos = new THREE.Vector2( -sceneWidth/2 + 50, 0 );
+                rightEdgePos = new THREE.Vector2( sceneWidth/2 - 50, 0 );
+
+                var repulsionParams = [
+                    // top
+                    {
+                        position:   topEdgePos,
+                        direction:  new THREE.Vector2( 0, -1 )
+                    },
+                    // bottom
+                    {
+                        position:   bottomEdgePos,
+                        direction:  new THREE.Vector2( 0, 1 )
+                    },
+                    // left
+                    {
+                        position:   leftEdgePos,
+                        direction:  new THREE.Vector2( 1, 0 )
+                    },
+                    // right
+                    {
+                        position:   rightEdgePos,
+                        direction:  new THREE.Vector2( -1, 0 )
+                    },
+                ];
+
+                var strength = APP.parameters.edge_force,
+                    maxDist = APP.parameters.edge_maxDist;
+
+                for ( var i = 0; i < repulsionParams.length; i++ ) {
+                    var params = repulsionParams[ i ];
+                    var repulsion = new APP.AttractionDirectional( params.position, params.direction, strength );
+                    repulsion.maxDist = maxDist;
+
+                    addParticlesToRepulsion( repulsion, clusters );
+
+                    edgeRepulsions.push( repulsion );
+
+                    physics.addAttraction( repulsion );
+                }
+
+                function addParticlesToRepulsion( repulsion, clusters ) {
+                    for ( var i = 0; i < clusters.length; i++ ) {
+                        var particles = clusters[ i ].interactiveParticles
+                        for ( var j = 0; j < particles.length; j++ ) {
+                            var particle = particles[ j ];
+                            repulsion.addParticle( particle );
+                        }
+                    }
+                }
+
+            }
+
+
+            function buildInterClusterSprings() {
+
+                var i, j, a, b;
+
+                for ( i = 0; i < clusters.length; i++ ) {
+                    a = clusters[ i ];
+                    for ( j = i+1; j < clusters.length; j++ ) {
+                        b = clusters[ j ];
+
+                        connectClusters( a, b );
+                    }
+                }
+
+                function connectClusters( clusterA, clusterB ) {
+
+                    var i, j, a, b, spring;
+
+                    for ( i = 0; i < clusterA.interactiveParticles.length; i++ ) {
+                        a = clusterA.interactiveParticles[ i ];
+                        for ( j = 0; j < clusterB.interactiveParticles.length; j++ ) {
+                            b = clusterB.interactiveParticles[ j ];
+
+                            spring = new APP.SpringMinDist( a, b, APP.parameters.inter_length, APP.parameters.inter_force );
+
+                            interClusterSprings.push( spring );
+
+                            physics.addSpring( spring );
+                        }
+                    }
+
+                }
+
+            }
+
+
+            function buildLinesBetweenNodes() {
+
+                // collect all the springs connecting nodes
+                interNodeSprings = getSprings();
+
+                var numParticles = interNodeSprings.length * 2,
+
+                    positions = new Float32Array( numParticles * 3 ),
+                    colors = new Float32Array( numParticles * 3 ),
+                    opacities = new Float32Array( numParticles ),
+
+                    color = new THREE.Color( 0x999999 );
+
+                for ( var i = 0, i3 = 0; i < numParticles; i ++, i3 += 3 ) {
+                    colors[ i3 + 0 ] = color.r;
+                    colors[ i3 + 1 ] = color.g;
+                    colors[ i3 + 2 ] = color.b;
+
+                    opacities[ i ] = 1;
+                }
+
+                geometryLines = new THREE.BufferGeometry();
+                geometryLines.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+                geometryLines.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+                geometryLines.addAttribute( 'opacity', new THREE.BufferAttribute( opacities, 1 ) );
+
+                //var lines = ;
+
+                scene.add( new THREE.LineSegments( geometryLines, materialLines2 ) );
+
+                function getSprings() {
+
+                    var springs = [],
+                        i, j;
+
+                    // internal springs
+                    for ( i = 0; i < clusters.length; i++ ) {
+                        var cluster = clusters[ i ];
+                        for ( j = 0; j < cluster.interactiveSprings.length; j++ ) {
+                            var spring = cluster.interactiveSprings[ j ];
+                            springs.push( spring );
+                        }
+                    }
+
+                    // inter-cluster springs
+                    for ( i = 0; i < interClusterSprings.length; i++ ) {
+                        var spring = interClusterSprings[ i ];
+                        springs.push( spring );
+                    }
+
+                    return springs;
+                }
+
+            }
+
+
+            function updateLinesBetweenNodes() {
+
+                var numSprings = interNodeSprings.length,
+                    positions = geometryLines.getAttribute('position').array,
+                    opacities = geometryLines.getAttribute('opacity').array,
+                    spring, opacity, a, b;
+
+                // iterate springs
+                for ( var i = 0, i2 = 0, i6 = 0; i < numSprings; i ++, i2 += 2, i6 += 6 ) {
+                    spring = interNodeSprings[ i ];
+
+                    a = spring.a.pos;
+                    b = spring.b.pos;
+
+                    opacity = 1 - (spring.length / lineOpacityThreshold);
+                    opacity = (opacity > 0.3) ? 0.3 : opacity;
+
+                    positions[ i6 + 0 ] = a.x;
+                    positions[ i6 + 1 ] = a.y;
+                    positions[ i6 + 2 ] = a.z;
+                    positions[ i6 + 3 ] = b.x;
+                    positions[ i6 + 4 ] = b.y;
+                    positions[ i6 + 5 ] = b.z;
+
+                    opacities[ i2 + 0 ] = opacity;
+                    opacities[ i2 + 1 ] = opacity;
+                }
+
+                geometryLines.getAttribute('position').needsUpdate = true;
+                geometryLines.getAttribute('opacity').needsUpdate = true;
+
+            }
+
+
+            function buildBottomBar( data ){
 
                 var clusterColor = new THREE.Color(),
                     clusterColorString;
@@ -288,7 +557,7 @@
                     cluster = clusters[ i ];
 
                     clusterColor.setHex( clusterData.color );
-                    clusterColorString = getColorString( clusterColor, 0.5 );
+                    clusterColorString = getColorString( clusterColor, 0.6 );
 
                     $bottomBar.find( '#' + clusterData.slug )
                         .css( 'border-top-color', '#' + clusterColor.getHexString() )
@@ -297,20 +566,19 @@
                 }
 
                 clusterColor.setHex( 0x777777 );
-                clusterColorString = getColorString( clusterColor, 0.5 );
+                clusterColorString = getColorString( clusterColor, 0.6 );
 
                 $bottomBar.find( '#category-0' )
                     .css( 'border-top-color', '#777777' )
                     .data( 'categoryIndex', -1 )
                     .data( 'color', clusterColorString );
 
-                function getColorString( color, alpha ) {
+                function getColorString( color, opacity ) {
                     var c = color.clone(),
                         r = c.r * 255,
                         g = c.g * 255,
-                        b = c.b * 255,
-                        a = alpha;
-                    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+                        b = c.b * 255;
+                    return 'rgba(' + r + ',' + g + ',' + b + ',' + opacity + ')';
                 }
 
             }
@@ -349,6 +617,12 @@
 
                 renderer.setSize( sceneWidth, sceneHeight );
 
+                //
+                topEdgePos.y = sceneHeight / 2;
+                bottomEdgePos.y = -(sceneHeight / 2) + 70 ;
+                leftEdgePos.x = -sceneWidth / 2;
+                rightEdgePos.x = sceneWidth / 2;
+
             }
 
 
@@ -375,8 +649,23 @@
                 gui.add( APP.parameters, 'spring_length_interactive', 0.0, 200.0 ).onChange( onSpringLengthInteractive );
                 gui.add( APP.parameters, 'attraction_strength_interactive', -1000.0, 1000.0 ).onChange( onAttractionStrengthInteractive );
 
-                gui.add( APP.parameters, 'gravity', 0.0, 10.0 ).onChange( onGravity );
-                gui.add( APP.parameters, 'background_darkness', 0.0, 1.0 ).onChange( onBackgroundDarkness );
+                gui.add( APP.parameters, 'gravity', 0.0, 2.0 ).onChange( onGravity );
+                //gui.add( APP.parameters, 'background_darkness', 0.0, 1.0 ).onChange( onBackgroundDarkness );
+
+                gui.add( APP.parameters, 'edge_force', 0, 2000 ).onChange( onEdgeForce );
+                gui.add( APP.parameters, 'edge_maxDist', 0, 1000 ).onChange( onEdgeMaxDist );
+
+                gui.add( APP.parameters, 'inter_force', 0, 5 ).onChange( onInterForce );
+                gui.add( APP.parameters, 'inter_length', 0, 200 ).onChange( onInterLength );
+
+
+                gui.add( APP.parameters, 'blooming_speed', 0, 1 );
+
+                gui.add( APP.parameters, 'line_opacity_threshold', 0, 500 ).onChange( onLineOpacityThresh );
+
+                gui.add( APP.parameters, 'render_lines' ).onChange( onRenderLines );
+
+                gui.add( APP.parameters, 'use_dark_theme').onChange( onUseDarkTheme );
 
                 // callbacks
 
@@ -444,9 +733,102 @@
 
                 function onBackgroundDarkness( value ) {
 
-                    var color = new THREE.Color( 0xF2F3F4 ).lerp ( new THREE.Color( 0.12,0.11,0.15 ), value )
+                    var color = new THREE.Color( 0xF2F3F4 ).lerp( new THREE.Color( 0.12,0.11,0.15 ), value )
                     renderer.setClearColor( color.getHex() );
 
+                }
+
+                function onEdgeForce( value ) {
+
+                    for ( var i = 0; i < edgeRepulsions.length; i++ ) {
+                        edgeRepulsions[ i ].strength = value;
+                    }
+
+                }
+
+                function onEdgeMaxDist( value ) {
+
+                    for ( var i = 0; i < edgeRepulsions.length; i++ ) {
+                        edgeRepulsions[ i ].maxDist = value;
+                    }
+
+                }
+
+                function onInterLength( value ) {
+
+                    for ( var i = 0; i < interClusterSprings.length; i++ ) {
+                        interClusterSprings[ i ].setLength( value );
+                    }
+
+                }
+
+                function onInterForce( value ) {
+
+                    for ( var i = 0; i < interClusterSprings.length; i++ ) {
+                        interClusterSprings[ i ].strength = value;
+                    }
+
+                }
+
+                function onRenderLines( value ) {
+
+                    materialLines.visible = value;
+
+                }
+
+                function onUseDarkTheme( value ) {
+
+                    if ( value === true ) {
+                        startThemeInterpolation( APP.theme.light, APP.theme.dark );
+                    } else {
+                        startThemeInterpolation( APP.theme.dark, APP.theme.light );
+                    }
+
+                }
+
+                function onLineOpacityThresh( value ) {
+
+                    lineOpacityThreshold = value;
+
+                }
+            }
+
+
+            function startThemeInterpolation( startTheme, targetTheme ) {
+
+                themeStart = startTheme;
+                themeEnd = targetTheme;
+
+                colorLerpPct = 0;
+
+                interpolateTheme();
+
+                // css transitions
+                if ( targetTheme === APP.theme.dark ){
+                    $bottomBar.find( '.button' ).addClass( 'dark' );
+                    $('#logo').addClass( 'dark' );
+                } else {
+                    $bottomBar.find( '.button' ).removeClass( 'dark' );
+                    $('#logo').removeClass( 'dark' );
+                }
+
+            }
+
+
+            function interpolateTheme() {
+
+                colorLerpPct += APP.parameters.theme_interpolation_speed;
+
+                if ( colorLerpPct < 1 ) {
+                    requestAnimationFrame( interpolateTheme );
+
+                    colorBackground = themeStart.backgroundColor.clone().lerp( themeEnd.backgroundColor, colorLerpPct ),
+                    // bottomBarColor = themeStart.bottomBarColor.clone().lerp( themeEnd.bottomBarColor, colorLerpPct ),
+                    nodesColor = themeStart.nodesColor.clone().lerp( themeEnd.nodesColor, colorLerpPct );
+
+                    renderer.setClearColor( colorBackground.getHex() );
+
+                    materialInteractiveParticles.color.copy( nodesColor );
                 }
 
             }

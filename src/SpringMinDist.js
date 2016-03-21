@@ -6,8 +6,10 @@ APP.SpringMinDist = function(a, b, length, strength) {
     this.restLengthSquared = this.restLength * this.restLength;
     this.strength = (typeof strength !== 'undefined') ? strength : 1;
 
-    // TODO fix this
+    // TODO fix this, we should use mass instead of this
     this.percent = 1;
+
+    this.length; // current distance between particles
 
 }
 
@@ -25,11 +27,16 @@ APP.SpringMinDist.prototype = {
 
         var a = this.a.pos,
             b = this.b.pos,
-            delta = b.clone().sub( a );
+            delta = b.clone().sub( a ),
+            deltaLength = delta.length();
 
-        if ( delta.lengthSq() < this.restLengthSquared ) {
-            var deltaLength = delta.length(),
-                ratio = (this.restLength - deltaLength) / deltaLength;
+        // cache distance value
+        this.length = deltaLength;
+
+
+        //if ( delta.lengthSq() < this.restLengthSquared ) {
+        if ( deltaLength < this.restLength ) {
+            var ratio = (this.restLength - deltaLength) / deltaLength;
 
             //ratio *= this.strength;
             // TODO fix this

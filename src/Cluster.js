@@ -1,4 +1,4 @@
-APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
+APP.Cluster = function( mouseParticle, materialPoints, materialLines, materialInteractiveParticles ) {
 
     // parameters ----------
 
@@ -38,6 +38,8 @@ APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
     this.materialLines = materialLines;
     this.walkerPoints; // debug
 
+    this.materialInteractiveParticles = materialInteractiveParticles;
+
     // rendering DOM ----------
 
     this.$nodes = [];
@@ -47,6 +49,13 @@ APP.Cluster = function( mouseParticle, materialPoints, materialLines ) {
     // the index of the cluster in the application's array of clusters
     // this relates clusters with data (eg: app.clusters[ index ] --> app.data[ index ]  )
     this.index;
+
+
+    // state transition animation
+    // this.transitionComplete = true;
+    this.transitionPct = 1;
+    this.paramsEnd;
+    this.paramsStart;
 
 }
 
@@ -223,7 +232,7 @@ APP.Cluster.prototype = {
 
     addToScene : function( scene ) {
 
-        scene.add( this.lines );
+        //scene.add( this.lines );
         scene.add( this.points );
         scene.add( this.walkerPoints );
 
@@ -253,7 +262,7 @@ APP.Cluster.prototype = {
             positions[ i3 + 2 ] = particle.z;
         }
         this.geometryPoints.getAttribute('position').needsUpdate = true;
-        this.geometryLines.verticesNeedUpdate = true;
+        //this.geometryLines.verticesNeedUpdate = true;
 
         // walkers positions
         for (var i = 0; i < this.walkers.length; i++) {
@@ -272,6 +281,9 @@ APP.Cluster.prototype = {
 
             $node.css('transform', 'translate3d(' + screenPos.x  + 'px,' + screenPos.y + 'px,0px)');
         }
+
+        // interpolate states
+        this._onTransition();
 
     },
 
@@ -450,7 +462,7 @@ APP.Cluster.prototype = {
         var self = this;
 
         buildPointsView();
-        buildLinesView();
+        //buildLinesView();
 
         function buildPointsView() {
 
@@ -489,7 +501,7 @@ APP.Cluster.prototype = {
                 sizes[ i ] = style_sizes[ randomIndex ];
 
                 rand = Math.random();
-                randomIndex = (rand <= 0.3) ? 1 : 0;
+                randomIndex = (rand <= 0.6) ? 1 : 0;
 
                 imageFlags[ i ] = randomIndex;
 
@@ -504,20 +516,17 @@ APP.Cluster.prototype = {
             self.points = new THREE.Points( self.geometryPoints, self.materialPoints );
 
             // TODO:
-            // include interactive particles to be rendered by shader material
+            // include interactive particles to be rendered by "interactiveMaterial" (PointsMaterial)
             // debug
 
-            var geom,
-                material = new THREE.PointsMaterial( { size: 15, color: 0x000000, sizeAttenuation: false, map: new THREE.TextureLoader().load( "assets/circle-marked.png" ), alphaTest: 0.5, transparent: true } );
-
-            material.visible = true;
+            var geom;
 
             // geom = new THREE.Geometry();
             // for (var i = 0; i < self.walkers.length; i++) {
             //     geom.vertices.push( self.walkers[i].particle.pos );
             //
             // }
-            // self.walkerPoints = new THREE.Points( geom, material );
+            // self.walkerPoints = new THREE.Points( geom, this.materialInteractiveParticles );
 
             // debug
 
@@ -526,7 +535,7 @@ APP.Cluster.prototype = {
                 geom.vertices.push( self.interactiveParticles[i].pos );
 
             }
-            self.walkerPoints = new THREE.Points( geom, material );
+            self.walkerPoints = new THREE.Points( geom, this.materialInteractiveParticles );
 
         }
 
@@ -537,6 +546,11 @@ APP.Cluster.prototype = {
                 var spring = self.interactiveSprings[ i ];
                 self.geometryLines.vertices.push( spring.a.pos, spring.b.pos );
             }
+
+            // for ( var i = 0; i < self.surfaceSprings.length; i++ ) {
+            //     var spring = self.surfaceSprings[ i ];
+            //     self.geometryLines.vertices.push( spring.a.pos, spring.b.pos );
+            // }
 
             self.lines = new THREE.LineSegments( self.geometryLines, self.materialLines );
 
@@ -555,8 +569,9 @@ APP.Cluster.prototype = {
             nodeData = clusterData.videos[ i ];
             $node = $( APP.templates.nodeTemplate );
             $node
+                .data( 'categoryIndex', this.index )
+                .data( 'nodeIndex', i )
                 .data( 'nodeData', {
-                    'id':          i,
                     'video':       nodeData.url,
                     'cover':       nodeData.cover,
                     'title':       nodeData.title,
@@ -573,21 +588,6 @@ APP.Cluster.prototype = {
 
             this.$nodes.push( $node );
         }
-    },
-
-
-    setState : function( state ) {
-
-        this.setClusterRadius( state['cluster_radius'] );
-        this.setSurfaceStrength( state['surface_strength'] );
-        this.setCentralAttraction( state['central_attraction'] );
-        this.setMouseAttraction( state['mouse_attraction'] );
-        this.setSpringStrengthInteractive( state['spring_strength_interactive'] );
-        this.setSpringLengthInteractive( state['spring_length_interactive'] );
-        this.setAttractionStrengthInteractive( state['attraction_strength_interactive'] );
-        this.setMouseAttractionEnabled( state['mouse_attraction_enabled'] );
-        this.setInteractiveEnabled( state['interactive_enabled'] );
-
     },
 
 
@@ -634,7 +634,68 @@ APP.Cluster.prototype = {
             $container.append( this.$nodes[ i ] );
         }
 
-    }
+    },
 
+
+    setState : function( state ) {
+
+        this.paramsStart = {
+            'cluster_radius':                   this.clusterRadius,
+            'surface_strength':                 this.surfaceStrength,
+            'central_attraction':               this.centralAttraction,
+            'mouse_attraction':                 this.mouseAttraction,
+            'spring_strength_interactive':      this.springStrengthInteractive,
+            'spring_length_interactive':        this.springLengthInteractive,
+            'attraction_strength_interactive':  this.attractionStrengthInteractive
+        }
+
+        this.paramsEnd = {
+            'cluster_radius':                   state['cluster_radius'],
+            'surface_strength':                 state['surface_strength'],
+            'central_attraction':               state['central_attraction'],
+            'mouse_attraction':                 state['mouse_attraction'],
+            'spring_strength_interactive':      state['spring_strength_interactive'],
+            'spring_length_interactive':        state['spring_length_interactive'],
+            'attraction_strength_interactive':  state['attraction_strength_interactive']
+        }
+
+        this.transitionPct = 0;
+
+        // this.setClusterRadius( state['cluster_radius'] );
+        // this.setSurfaceStrength( state['surface_strength'] );
+        // this.setCentralAttraction( state['central_attraction'] );
+        // this.setMouseAttraction( state['mouse_attraction'] );
+        // this.setSpringStrengthInteractive( state['spring_strength_interactive'] );
+        // this.setSpringLengthInteractive( state['spring_length_interactive'] );
+        // this.setAttractionStrengthInteractive( state['attraction_strength_interactive'] );
+        this.setMouseAttractionEnabled( state['mouse_attraction_enabled'] );    // non interpolable
+        this.setInteractiveEnabled( state['interactive_enabled'] );
+
+    },
+
+
+    _onTransition : function() {
+
+        if ( this.transitionPct < 1 ) {
+
+            this.transitionPct += APP.parameters.blooming_speed;
+
+            this.setClusterRadius( this._lerpParam( 'cluster_radius', this.transitionPct ) );
+            this.setSurfaceStrength( this._lerpParam( 'surface_strength', this.transitionPct ) );
+            this.setCentralAttraction( this._lerpParam( 'central_attraction', this.transitionPct ) );
+            this.setMouseAttraction( this._lerpParam( 'mouse_attraction', this.transitionPct ) );
+            this.setSpringStrengthInteractive( this._lerpParam( 'spring_strength_interactive', this.transitionPct ) );
+            this.setSpringLengthInteractive( this._lerpParam( 'spring_length_interactive', this.transitionPct ) );
+            this.setAttractionStrengthInteractive( this._lerpParam( 'attraction_strength_interactive', this.transitionPct ) );
+        }
+
+    },
+
+
+    _lerpParam : function( paramName, pct  ) {
+        var start = this.paramsStart[ paramName ],
+            end = this.paramsEnd[ paramName ];
+        return start + (end - start) * pct;
+    }
 
 }

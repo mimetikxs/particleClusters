@@ -4,7 +4,7 @@ APP.Walker = function( speed ) {
     this.particle.isFixed = true;
 
     this.attractions = [];
-    this.attractionStrength = -16;
+    this.attractionStrength = -46, //-16;
 
     this.springs = [];
     this.springsStrength = 0.03;
@@ -13,7 +13,7 @@ APP.Walker = function( speed ) {
     this.vy = 0;
     //amplitud de giros
     this.amp = 2.5; //3.5; // amplitud maximo del angulo
-    this.ta = 3;    // amplitud del angulo (empieza desde 6)
+    this.ta = 3;    // amplitud del angulo
     this.i;         // incremento del angulo
 
     this.constraint;
