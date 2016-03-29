@@ -60,13 +60,13 @@ APP.clusterParameters = {
     default : {
         //normal nodes
         cluster_radius:       220.0,
-        surface_strength:     0.0037,
+        surface_strength:     0.0019, //0.0037,
         central_attraction:   91.0,
         mouse_attraction:     -14.0,
         // interactive nodes
-        spring_strength_interactive:     0.41, //0.015, //0.022,
+        spring_strength_interactive:     0.41,   //0.015, //0.022,
         spring_length_interactive:       163,    //163,
-        attraction_strength_interactive: -70, //-177,    //16,
+        attraction_strength_interactive: -29,    //-70, //-177,    //16,
         // flags
         interactive_enabled:        true,
         mouse_attraction_enabled:   true

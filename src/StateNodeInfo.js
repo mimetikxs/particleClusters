@@ -31,17 +31,18 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
         // build info box
         model.$boxInfo
-            .find('.title').text( nodeData.title ).end()
+            .find( '.title' ).text( nodeData.title ).end()
             //.find('.subtitle').text( nodeData.subtitle ).end()
             //.find('.description').text( nodeData.description ).end()
             // TODO...
 
         // show info box
-        model.$boxInfo.css({
-            'background-color': clusterColor,
-            'border-color': clusterColor,
-            'visibility': 'visible'
-        });
+        model.$boxInfo
+            .css({
+                'background-color': clusterColor,
+                'border-color': clusterColor
+            })
+            .addClass( 'visible' );
 
         // attach events to close button
         model.$boxInfo.find( '.button-close' )
@@ -70,9 +71,7 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
         model.$layerNodes.off();
 
-        model.$boxInfo.css({
-            'visibility': 'hidden'
-        });
+        model.$boxInfo.removeClass( 'visible' );
 
     }
 

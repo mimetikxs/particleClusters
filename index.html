@@ -12,12 +12,19 @@
 
         <div id="logo"></div>
 
+        <div id="right-bar">
+            <div class="button" id="btn-info"></div>
+            <div class="toggle" id="btn-change-theme"></div>
+            <div class="button" id="btn-randomize"></div>
+            <div class="button" id="btn-reset"></div>
+        </div>
+
         <div id="box-info">
             <div class="image"></div>
             <div class="info">
                 <div class="title">Video title goes here</div>
-                <div class="subtitle">This is the subtitle</div>
-                <div class="description">bla bla bla</div>
+                <div class="subtitle">Dolorum accumsan deterruisset no nam</div>
+                <div class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
             </div>
             <div class="button-play">play video</div>
             <div class="button-close">×</div>
@@ -244,7 +251,7 @@
 
 		        $layerGl.append( $(renderer.domElement) );
 
-                buildGui();
+                // buildGui();
 
                 initMaterials();
                 initPhysics();
@@ -253,6 +260,7 @@
                 buildLinesBetweenNodes();
                 buildEdgeRepulsions();
                 buildBottomBar( APP.data );
+                buildRightBar();
 
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -584,6 +592,21 @@
             }
 
 
+            function buildRightBar(){
+                $('#btn-change-theme')
+                    .on( 'click', function( e ) {
+                        var toggle = $(this);
+                        if ( toggle.hasClass('toggled') ) {
+                            toggle.removeClass('toggled');
+                            startThemeInterpolation( APP.theme.dark, APP.theme.light );
+                        } else {
+                            toggle.addClass('toggled');
+                            startThemeInterpolation( APP.theme.light, APP.theme.dark );
+                        }
+                    });
+            }
+
+
             function onDocumentMouseMove( event ) {
 
 				mouseParticle.pos.x = event.clientX - sceneWidth/2;
@@ -626,6 +649,48 @@
             }
 
 
+            function startThemeInterpolation( startTheme, targetTheme ) {
+
+                themeStart = startTheme;
+                themeEnd = targetTheme;
+
+                colorLerpPct = 0;
+
+                interpolateTheme();
+
+                // css transitions
+                if ( targetTheme === APP.theme.dark ){
+                    $bottomBar.find( '.button' ).addClass( 'dark' );
+                    $('#logo').addClass( 'dark' );
+                    $('#right-bar').addClass( 'dark' );
+                } else {
+                    $bottomBar.find( '.button' ).removeClass( 'dark' );
+                    $('#logo').removeClass( 'dark' );
+                    $('#right-bar').removeClass( 'dark' );
+                }
+
+            }
+
+
+            function interpolateTheme() {
+
+                colorLerpPct += APP.parameters.theme_interpolation_speed;
+
+                if ( colorLerpPct < 1 ) {
+                    requestAnimationFrame( interpolateTheme );
+
+                    colorBackground = themeStart.backgroundColor.clone().lerp( themeEnd.backgroundColor, colorLerpPct ),
+                    // bottomBarColor = themeStart.bottomBarColor.clone().lerp( themeEnd.bottomBarColor, colorLerpPct ),
+                    nodesColor = themeStart.nodesColor.clone().lerp( themeEnd.nodesColor, colorLerpPct );
+
+                    renderer.setClearColor( colorBackground.getHex() );
+
+                    materialInteractiveParticles.color.copy( nodesColor );
+                }
+
+            }
+
+
             // gui -----------------------------------
 
 
@@ -638,10 +703,10 @@
 
                 gui = new dat.GUI( { width: 350 } );
 
-                gui.remember( APP.parameters );
+                //gui.remember( APP.parameters );
 
                 gui.add( APP.parameters, 'cluster_radius', 10.0, 250.0 ).onChange( onClusterRadius );
-                gui.add( APP.parameters, 'surface_strength', 0.0, 0.05 ).onChange( onSurfaceStrength );
+                //gui.add( APP.parameters, 'surface_strength', 0.0, 0.05 ).onChange( onSurfaceStrength );
                 gui.add( APP.parameters, 'central_attraction', -1000.0, 1000.0 ).onChange( onCentralRepulsion );
                 gui.add( APP.parameters, 'mouse_attraction', -500.0, 500.0 ).onChange( onMouseAttraction );
 
@@ -663,9 +728,11 @@
 
                 gui.add( APP.parameters, 'line_opacity_threshold', 0, 500 ).onChange( onLineOpacityThresh );
 
-                gui.add( APP.parameters, 'render_lines' ).onChange( onRenderLines );
+                //gui.add( APP.parameters, 'render_lines' ).onChange( onRenderLines );
 
                 gui.add( APP.parameters, 'use_dark_theme').onChange( onUseDarkTheme );
+
+                gui.close();
 
                 // callbacks
 
@@ -791,46 +858,6 @@
                     lineOpacityThreshold = value;
 
                 }
-            }
-
-
-            function startThemeInterpolation( startTheme, targetTheme ) {
-
-                themeStart = startTheme;
-                themeEnd = targetTheme;
-
-                colorLerpPct = 0;
-
-                interpolateTheme();
-
-                // css transitions
-                if ( targetTheme === APP.theme.dark ){
-                    $bottomBar.find( '.button' ).addClass( 'dark' );
-                    $('#logo').addClass( 'dark' );
-                } else {
-                    $bottomBar.find( '.button' ).removeClass( 'dark' );
-                    $('#logo').removeClass( 'dark' );
-                }
-
-            }
-
-
-            function interpolateTheme() {
-
-                colorLerpPct += APP.parameters.theme_interpolation_speed;
-
-                if ( colorLerpPct < 1 ) {
-                    requestAnimationFrame( interpolateTheme );
-
-                    colorBackground = themeStart.backgroundColor.clone().lerp( themeEnd.backgroundColor, colorLerpPct ),
-                    // bottomBarColor = themeStart.bottomBarColor.clone().lerp( themeEnd.bottomBarColor, colorLerpPct ),
-                    nodesColor = themeStart.nodesColor.clone().lerp( themeEnd.nodesColor, colorLerpPct );
-
-                    renderer.setClearColor( colorBackground.getHex() );
-
-                    materialInteractiveParticles.color.copy( nodesColor );
-                }
-
             }
 
 

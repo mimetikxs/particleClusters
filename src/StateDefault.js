@@ -8,7 +8,7 @@ APP.StateDefault = function( model, categoryIndex ) {
 
         if ( index !== -1 ) {
 
-            console.log("filter ON (" + index + ")" );
+            // console.log("filter ON (" + index + ")" );
 
             for ( var i = 0; i < model.clusters.length; i++ ) {
                 model.clusters[ i ].setState( ( i === index ) ? APP.clusterParameters.opened : APP.clusterParameters.closed );
@@ -17,9 +17,17 @@ APP.StateDefault = function( model, categoryIndex ) {
             model.lineOpacityThreshold = 176;
             mouseBloomingEnabled = false;
 
+            // testing
+            $('#btn-randomize')
+                .off( 'click', onRandomizeClick )
+                .addClass( 'disabled' );
+            $('#btn-reset')
+                .off( 'click', onResetClick )
+                .addClass( 'disabled' );
+
         } else {
 
-            console.log("filter OFF" );
+            // console.log("filter OFF" );
 
             for ( var i = 0; i < model.clusters.length; i++ ) {
                 model.clusters[ i ].setState( APP.clusterParameters.default );
@@ -27,6 +35,14 @@ APP.StateDefault = function( model, categoryIndex ) {
             model.physics.gravity.z = 0.45, //APP.parameters.gravity;
             model.lineOpacityThreshold = 280;
             mouseBloomingEnabled = true;
+
+            // testing
+            $('#btn-randomize')
+                .on( 'click', onRandomizeClick )
+                .removeClass( 'disabled' );
+            $('#btn-reset')
+                .on( 'click', onResetClick )
+                .removeClass( 'disabled' );
 
         }
 
@@ -97,6 +113,46 @@ APP.StateDefault = function( model, categoryIndex ) {
     }
 
 
+    function onRandomizeClick( e ) {
+
+        var randomRadius = 82 + Math.random() * 168,
+            randomStrengthInteractive = -1000 + Math.random() * 2000,
+            cluster, tagetState;
+
+        console.log('RANDOMIZE:' + '\n' +
+                    'random radius = ' + randomRadius + '\n' +
+                    'random strength = ' + randomStrengthInteractive + '\n' +
+                    '---------');
+
+        for ( var i = 0; i < model.clusters.length; i++ ) {
+            cluster = model.clusters[ i ];
+            tagetState = {
+                'cluster_radius':                   randomRadius,
+                'surface_strength':                 cluster.surfaceStrength,
+                'central_attraction':               cluster.centralAttraction,
+                'mouse_attraction':                 cluster.mouseAttraction,
+                'spring_strength_interactive':      cluster.springStrengthInteractive,
+                'spring_length_interactive':        cluster.springLengthInteractive,
+                'attraction_strength_interactive':  randomStrengthInteractive,
+                'interactive_enabled':              cluster.interactiveEnabled,
+                'mouse_attraction_enabled':         cluster.mouseAttractionEnabled
+            };
+            cluster.setState( tagetState );
+        }
+
+    }
+
+
+    function onResetClick( e ) {
+
+        console.log('RESET' + '\n' +
+                    '---------');
+
+        filterCategory( categoryIndex );
+
+    }
+
+
     function enableMouseEvents() {
 
         model.$bottomBar
@@ -106,6 +162,14 @@ APP.StateDefault = function( model, categoryIndex ) {
 
         model.$layerNodes
             .on( 'click', '.node', onNodeClick );
+
+        // testing
+        // $('#btn-randomize')
+        //     .on( 'click', onRandomizeClick )
+        //     .removeClass( 'disabled' );
+        // $('#btn-reset')
+        //     .on( 'click', onResetClick )
+        //     .removeClass( 'disabled' );
 
     }
 
@@ -119,6 +183,14 @@ APP.StateDefault = function( model, categoryIndex ) {
 
         model.$layerNodes
             .off( 'click', '.node', onNodeClick );
+
+        // testing
+        $('#btn-randomize')
+            .off( 'click', onRandomizeClick )
+            .addClass( 'disabled' );
+        $('#btn-reset')
+            .off( 'click', onResetClick )
+            .addClass( 'disabled' );
 
     }
 
