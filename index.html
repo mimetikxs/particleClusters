@@ -22,65 +22,18 @@
         <div id="box-info">
             <div class="image"></div>
             <div class="info">
-                <div class="title">Video title goes here</div>
-                <div class="subtitle">Dolorum accumsan deterruisset no nam</div>
-                <div class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+                <div class="title"></div>
+                <div class="description"></div>
+                <div class="button-play">play video</div>
             </div>
-            <div class="button-play">play video</div>
             <div class="button-close">×</div>
         </div>
 
-        <div id="bottom-bar">
-            <div class="button" id="category-0">
-                <div class="title">
-                    All
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
-            <div class="button" id="category-1">
-                <div class="title">
-                    Category 1
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
-            <div class="button" id="category-2">
-                <div class="title">
-                    Category 2
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
-            <div class="button" id="category-3">
-                <div class="title">
-                    Category 3
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
-            <div class="button" id="category-4">
-                <div class="title">
-                    Category 4
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
-            <div class="button" id="category-5">
-                <div class="title">
-                    Category 5
-                </div>
-                <div class="subtitle">
-                    Lorem ipsum dolor sit amet
-                </div>
-            </div>
+        <div id="video-container" style="display: block;">
+
         </div>
 
+        <div id="bottom-bar"></div>
 
         <script src="lib/jquery-1.12.0.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
@@ -99,6 +52,7 @@
         <script src="src/Cluster.js"></script>
         <script src="src/StateDefault.js"></script>
         <script src="src/StateNodeInfo.js"></script>
+        <script src="src/StateVideo.js"></script>
 
 
         <script type="x-shader/x-vertex" id="vertexshader">
@@ -226,6 +180,9 @@
                 backgroundColor = APP.theme.light.backgroundColor.clone(),
                 bottomBarColor = APP.theme.light.bottomBarColor.clone(),
                 nodesColor = APP.theme.light.nodesColor.clone();
+
+            // randomizer
+            var randomRadius, randomStrengthInteractive;
 
 
             init();
@@ -558,28 +515,41 @@
             function buildBottomBar( data ){
 
                 var clusterColor = new THREE.Color(),
-                    clusterColorString;
+                    clusterColorString,
+                    clusterData, $button;
+
 
                 for ( i = 0; i < data.length; i++ ) {
                     clusterData = data[ i ];
-                    cluster = clusters[ i ];
 
                     clusterColor.setHex( clusterData.color );
                     clusterColorString = getColorString( clusterColor, 0.6 );
 
-                    $bottomBar.find( '#' + clusterData.slug )
+                    $button = $(APP.templates.buttonTemplate);
+                    $button
+                        .attr( 'id', clusterData.slug )
                         .css( 'border-top-color', '#' + clusterColor.getHexString() )
                         .data( 'categoryIndex', i )
-                        .data( 'color', clusterColorString );
+                        .data( 'color', clusterColorString )
+                        .find('.title').text( clusterData.name );
+
+                    $bottomBar.append( $button );
                 }
 
                 clusterColor.setHex( 0x777777 );
                 clusterColorString = getColorString( clusterColor, 0.6 );
 
-                $bottomBar.find( '#category-0' )
+                // button 'all'
+                $button = $(APP.templates.buttonTemplate);
+                $button
+                    .attr( 'id', 'category-0' )
                     .css( 'border-top-color', '#777777' )
                     .data( 'categoryIndex', -1 )
-                    .data( 'color', clusterColorString );
+                    .data( 'color', clusterColorString )
+                    .find('.title').text( "TODOS" );
+
+                $bottomBar.prepend( $button );
+
 
                 function getColorString( color, opacity ) {
                     var c = color.clone(),

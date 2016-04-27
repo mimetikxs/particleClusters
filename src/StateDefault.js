@@ -19,18 +19,31 @@ APP.StateDefault = function( model, categoryIndex ) {
 
             // testing
             $('#btn-randomize')
-                .off( 'click', onRandomizeClick )
                 .addClass( 'disabled' );
             $('#btn-reset')
-                .off( 'click', onResetClick )
                 .addClass( 'disabled' );
 
         } else {
 
             // console.log("filter OFF" );
+            // console.log(model.randomRadius);
+
+            var defaultParams = APP.clusterParameters.default,
+                tagetState = {
+                'cluster_radius':                   (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
+                'surface_strength':                 defaultParams.surface_strength,
+                'central_attraction':               defaultParams.central_attraction,
+                'mouse_attraction':                 defaultParams.mouse_attraction,
+                'spring_strength_interactive':      defaultParams.spring_strength_interactive,
+                'spring_length_interactive':        defaultParams.spring_length_interactive,
+                'attraction_strength_interactive':  (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
+                'interactive_enabled':              defaultParams.interactive_enabled,
+                'mouse_attraction_enabled':         defaultParams.mouse_attraction_enabled
+            };
 
             for ( var i = 0; i < model.clusters.length; i++ ) {
-                model.clusters[ i ].setState( APP.clusterParameters.default );
+                //model.clusters[ i ].setState( APP.clusterParameters.default );
+                model.clusters[ i ].setState( tagetState );
             }
             model.physics.gravity.z = 0.45, //APP.parameters.gravity;
             model.lineOpacityThreshold = 280;
@@ -38,10 +51,8 @@ APP.StateDefault = function( model, categoryIndex ) {
 
             // testing
             $('#btn-randomize')
-                .on( 'click', onRandomizeClick )
                 .removeClass( 'disabled' );
             $('#btn-reset')
-                .on( 'click', onResetClick )
                 .removeClass( 'disabled' );
 
         }
@@ -115,40 +126,53 @@ APP.StateDefault = function( model, categoryIndex ) {
 
     function onRandomizeClick( e ) {
 
-        var randomRadius = 82 + Math.random() * 168,
-            randomStrengthInteractive = -1000 + Math.random() * 2000,
-            cluster, tagetState;
+        if ( $(this).hasClass('disabled') ) {
+            return;
+        }
+
+        model.randomRadius = 82 + Math.random() * 168;
+        model.randomStrengthInteractive = -1000 + Math.random() * 2000;
 
         console.log('RANDOMIZE:' + '\n' +
-                    'random radius = ' + randomRadius + '\n' +
-                    'random strength = ' + randomStrengthInteractive + '\n' +
+                    'random radius = ' + model.randomRadius + '\n' +
+                    'random strength = ' + model.randomStrengthInteractive + '\n' +
                     '---------');
 
-        for ( var i = 0; i < model.clusters.length; i++ ) {
-            cluster = model.clusters[ i ];
-            tagetState = {
-                'cluster_radius':                   randomRadius,
-                'surface_strength':                 cluster.surfaceStrength,
-                'central_attraction':               cluster.centralAttraction,
-                'mouse_attraction':                 cluster.mouseAttraction,
-                'spring_strength_interactive':      cluster.springStrengthInteractive,
-                'spring_length_interactive':        cluster.springLengthInteractive,
-                'attraction_strength_interactive':  randomStrengthInteractive,
-                'interactive_enabled':              cluster.interactiveEnabled,
-                'mouse_attraction_enabled':         cluster.mouseAttractionEnabled
-            };
-            cluster.setState( tagetState );
-        }
+        // var defaultParams = APP.clusterParameters.default,
+        //     tagetState = {
+        //     'cluster_radius':                   (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
+        //     'surface_strength':                 defaultParams.surface_strength,
+        //     'central_attraction':               defaultParams.central_attraction,
+        //     'mouse_attraction':                 defaultParams.mouse_attraction,
+        //     'spring_strength_interactive':      defaultParams.spring_strength_interactive,
+        //     'spring_length_interactive':        defaultParams.spring_length_interactive,
+        //     'attraction_strength_interactive':  (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
+        //     'interactive_enabled':              defaultParams.interactive_enabled,
+        //     'mouse_attraction_enabled':         defaultParams.mouse_attraction_enabled
+        // };
+        //
+        // for ( var i = 0; i < model.clusters.length; i++ ) {
+        //     model.clusters[ i ].setState( tagetState );
+        // }
+
+        filterCategory( model.filterCategoryIndex ); // keep the current category filter
 
     }
 
 
     function onResetClick( e ) {
 
+        if ( $(this).hasClass('disabled') ) {
+            return;
+        }
+
+        model.randomRadius = APP.clusterParameters.default.cluster_radius;
+        model.randomStrengthInteractive = APP.clusterParameters.default.attraction_strength_interactive;
+
         console.log('RESET' + '\n' +
                     '---------');
 
-        filterCategory( categoryIndex );
+        filterCategory( model.filterCategoryIndex ); // keep the current category filter
 
     }
 
@@ -164,12 +188,12 @@ APP.StateDefault = function( model, categoryIndex ) {
             .on( 'click', '.node', onNodeClick );
 
         // testing
-        // $('#btn-randomize')
-        //     .on( 'click', onRandomizeClick )
-        //     .removeClass( 'disabled' );
-        // $('#btn-reset')
-        //     .on( 'click', onResetClick )
-        //     .removeClass( 'disabled' );
+        $('#btn-randomize')
+            .on( 'click', onRandomizeClick )
+            .removeClass( 'disabled' );
+        $('#btn-reset')
+            .on( 'click', onResetClick )
+            .removeClass( 'disabled' );
 
     }
 
@@ -269,6 +293,8 @@ APP.StateDefault = function( model, categoryIndex ) {
     this.exit = function() {
 
         disableMouseEvents();
+
+        //onResetClick();
 
     }
 }

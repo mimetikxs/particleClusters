@@ -1,8 +1,15 @@
 APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
-    function exit() {
+    function close() {
 
         model.setState( new APP.StateDefault( model, model.filterCategoryIndex ) );
+
+    }
+
+
+    function playVideo() {
+
+        model.setState( new APP.StateVideo( model, categoryIndex, nodeIndex ) );
 
     }
 
@@ -32,9 +39,9 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
         // build info box
         model.$boxInfo
             .find( '.title' ).text( nodeData.title ).end()
-            //.find('.subtitle').text( nodeData.subtitle ).end()
-            //.find('.description').text( nodeData.description ).end()
-            // TODO...
+            // .find('.subtitle').text( nodeData.subtitle ).end()
+            .find('.description').text( nodeData.description ).end()
+            .css('margin-top', -model.$boxInfo.height()/2);
 
         // show info box
         model.$boxInfo
@@ -47,12 +54,10 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
         // attach events to close button
         model.$boxInfo.find( '.button-close' )
             .css( 'background-color', clusterColor )
-            .on( 'click', exit );
+            .on( 'click', close );
 
         // attach events to play button
-        // TODO...
-
-
+        $('.button-play').on( 'click', playVideo );
     }
 
 
@@ -71,7 +76,11 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
         model.$layerNodes.off();
 
-        model.$boxInfo.removeClass( 'visible' );
+        model.$boxInfo
+            .off()
+            .removeClass( 'visible' );
+
+        $('.button-play').off();
 
     }
 

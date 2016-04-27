@@ -1,12 +1,12 @@
 
 // stub:
-// var State = function( app ) {
-//     var app = app;
-//
-//     this.enter = function();
-//     this.update = function();
-//     this.exit = function();
-// }
+var State = function( app ) {
+    var app = app;
+
+    this.enter = function();
+    this.update = function();
+    this.exit = function();
+}
 
 // stub:
 // var StateMachine = function() {

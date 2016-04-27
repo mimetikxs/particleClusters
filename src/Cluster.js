@@ -565,7 +565,14 @@ APP.Cluster.prototype = {
             color = new THREE.Color().setHex( clusterData.color ),
             category = clusterData.slug;
 
+        var randomSizes = [30, 35, 28],
+            randomSize,
+            randomIndex;
+
         for ( i = 0; i < clusterData.videos.length; i++ ) {
+            randomIndex = Math.floor( Math.random() * 3 );
+            randomSize = randomSizes[ randomIndex ];
+
             nodeData = clusterData.videos[ i ];
             $node = $( APP.templates.nodeTemplate );
             $node
@@ -582,8 +589,8 @@ APP.Cluster.prototype = {
                 //.attr( 'id', category + '-' + nodeData.slug )
                 .find( '.circle' ).css({
                     'background-color': '#' + color.getHexString(),
-                    'width':  nodeData.size,
-                    'height': nodeData.size
+                    'width':  randomSize,
+                    'height': randomSize
                 });
 
             this.$nodes.push( $node );
