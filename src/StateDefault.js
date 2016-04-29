@@ -30,16 +30,16 @@ APP.StateDefault = function( model, categoryIndex ) {
 
             var defaultParams = APP.clusterParameters.default,
                 tagetState = {
-                'cluster_radius':                   (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
-                'surface_strength':                 defaultParams.surface_strength,
-                'central_attraction':               defaultParams.central_attraction,
-                'mouse_attraction':                 defaultParams.mouse_attraction,
-                'spring_strength_interactive':      defaultParams.spring_strength_interactive,
-                'spring_length_interactive':        defaultParams.spring_length_interactive,
-                'attraction_strength_interactive':  (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
-                'interactive_enabled':              defaultParams.interactive_enabled,
-                'mouse_attraction_enabled':         defaultParams.mouse_attraction_enabled
-            };
+                    'cluster_radius':                   (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
+                    'surface_strength':                 defaultParams.surface_strength,
+                    'central_attraction':               defaultParams.central_attraction,
+                    'mouse_attraction':                 defaultParams.mouse_attraction,
+                    'spring_strength_interactive':      defaultParams.spring_strength_interactive,
+                    'spring_length_interactive':        defaultParams.spring_length_interactive,
+                    'attraction_strength_interactive':  (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
+                    'interactive_enabled':              defaultParams.interactive_enabled,
+                    'mouse_attraction_enabled':         defaultParams.mouse_attraction_enabled
+                };
 
             for ( var i = 0; i < model.clusters.length; i++ ) {
                 //model.clusters[ i ].setState( APP.clusterParameters.default );
@@ -65,6 +65,12 @@ APP.StateDefault = function( model, categoryIndex ) {
     function goToNode( categoryIndex, nodeIndex ) {
 
         model.setState( new APP.StateNodeInfo( model, categoryIndex, nodeIndex ) );
+
+    }
+
+    function showGeneralInfo() {
+
+        model.setState( new APP.StateGeneralInfo( model ) );
 
     }
 
@@ -130,30 +136,34 @@ APP.StateDefault = function( model, categoryIndex ) {
             return;
         }
 
-        model.randomRadius = 82 + Math.random() * 168;
-        model.randomStrengthInteractive = -1000 + Math.random() * 2000;
+        // calculate random values
+        var defaultParams = APP.clusterParameters.default,
+            currentRadius = (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
+            currentStrength = (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
+            newRandomRadius,
+            newRandomStrength,
+            isValid;
+
+        isValid = false;
+        while ( !isValid ) {
+            newRandomRadius = 82 + Math.random() * 168;
+            isValid = Math.abs(currentRadius - newRandomRadius) > 80;
+        }
+
+        isValid = false;
+        while ( !isValid ) {
+            newRandomStrength = -1000 + Math.random() * 2000;
+            isValid = Math.abs(currentStrength - newRandomStrength) > 300;
+        }
+
+        // apply values
+        model.randomRadius = newRandomRadius;
+        model.randomStrengthInteractive = newRandomStrength;
 
         console.log('RANDOMIZE:' + '\n' +
                     'random radius = ' + model.randomRadius + '\n' +
                     'random strength = ' + model.randomStrengthInteractive + '\n' +
                     '---------');
-
-        // var defaultParams = APP.clusterParameters.default,
-        //     tagetState = {
-        //     'cluster_radius':                   (model.randomRadius === undefined) ?  defaultParams.cluster_radius : model.randomRadius,
-        //     'surface_strength':                 defaultParams.surface_strength,
-        //     'central_attraction':               defaultParams.central_attraction,
-        //     'mouse_attraction':                 defaultParams.mouse_attraction,
-        //     'spring_strength_interactive':      defaultParams.spring_strength_interactive,
-        //     'spring_length_interactive':        defaultParams.spring_length_interactive,
-        //     'attraction_strength_interactive':  (model.randomStrengthInteractive === undefined) ? defaultParams.attraction_strength_interactive : model.randomStrengthInteractive,
-        //     'interactive_enabled':              defaultParams.interactive_enabled,
-        //     'mouse_attraction_enabled':         defaultParams.mouse_attraction_enabled
-        // };
-        //
-        // for ( var i = 0; i < model.clusters.length; i++ ) {
-        //     model.clusters[ i ].setState( tagetState );
-        // }
 
         filterCategory( model.filterCategoryIndex ); // keep the current category filter
 
@@ -195,6 +205,9 @@ APP.StateDefault = function( model, categoryIndex ) {
             .on( 'click', onResetClick )
             .removeClass( 'disabled' );
 
+        // attach event to general info btn
+        $('#btn-info').on( 'click', showGeneralInfo );
+
     }
 
 
@@ -215,6 +228,8 @@ APP.StateDefault = function( model, categoryIndex ) {
         $('#btn-reset')
             .off( 'click', onResetClick )
             .addClass( 'disabled' );
+
+        $('#btn-info').off();
 
     }
 

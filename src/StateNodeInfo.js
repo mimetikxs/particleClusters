@@ -14,6 +14,13 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
     }
 
 
+    function showGeneralInfo() {
+
+        model.setState( new APP.StateGeneralInfo( model ) );
+
+    }
+
+
     this.enter = function() {
 
         // var categoryName = APP.data[ categoryIndex ].name,
@@ -58,6 +65,9 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
         // attach events to play button
         $('.button-play').on( 'click', playVideo );
+
+        // attach event to general info btn
+        $('#btn-info').on( 'click', showGeneralInfo );
     }
 
 
@@ -81,6 +91,8 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
             .removeClass( 'visible' );
 
         $('.button-play').off();
+
+        $('#btn-info').off();
 
     }
 

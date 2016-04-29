@@ -11,12 +11,13 @@
         <div id="layer-nodes"></div>
 
         <div id="logo"></div>
+        <div id="logo-educar" class="logo-educa"></div>
 
         <div id="right-bar">
-            <div class="button" id="btn-info"></div>
-            <div class="toggle" id="btn-change-theme"></div>
-            <div class="button" id="btn-randomize"></div>
-            <div class="button" id="btn-reset"></div>
+            <div class="button" id="btn-info" title="Mostrar información"></div>
+            <div class="toggle" id="btn-change-theme" title="Cambiar color"></div>
+            <div class="button" id="btn-randomize" title="Efecto aleatorio"></div>
+            <div class="button" id="btn-reset" title="Resetear efecto"></div>
         </div>
 
         <div id="box-info">
@@ -29,8 +30,15 @@
             <div class="button-close">×</div>
         </div>
 
-        <div id="video-container" style="display: block;">
-
+        <div id="box-general-info">
+            <div class="button-close">×</div>
+            <h2>Acerca de esta página</h2>
+            <p>
+                Lorem ipsum dolor sit amet, eius summo ceteros an has, an congue dissentiet eum. Eam te mucius eligendi. Cu cum decore labitur incorrupte, mel noster senserit percipitur ne, est an vidit molestiae constituto. Est ut ludus zril. Ea duo utinam omittantur. Democritum instructior nec ut.
+            </p>
+            <p>
+                In wisi eirmod nam, ei his harum qualisque. Id nec integre delicatissimi. Nihil saperet ei nam, verear inermis veritus ad est. Fabulas albucius eos et. Sed enim autem et, eros consul partiendo an mea, pro quot adolescens assueverit an. Lorem facer eum ne, qui in tamquam tacimates honestatis.
+            </p>
         </div>
 
         <div id="bottom-bar"></div>
@@ -53,7 +61,7 @@
         <script src="src/StateDefault.js"></script>
         <script src="src/StateNodeInfo.js"></script>
         <script src="src/StateVideo.js"></script>
-
+        <script src="src/StateGeneralInfo.js"></script>
 
         <script type="x-shader/x-vertex" id="vertexshader">
 
@@ -226,6 +234,9 @@
 
                 setState( new APP.StateDefault( this, -1 ) );
 
+                // disable mouse events on logos
+                document.getElementById('logo-educar').style.pointerEvents = 'none';
+                document.getElementById('logo').style.pointerEvents = 'none';
             }
 
 
@@ -631,12 +642,10 @@
                 // css transitions
                 if ( targetTheme === APP.theme.dark ){
                     $bottomBar.find( '.button' ).addClass( 'dark' );
-                    $('#logo').addClass( 'dark' );
-                    $('#right-bar').addClass( 'dark' );
+                    $('#logo, #right-bar, #box-general-info').addClass( 'dark' );
                 } else {
                     $bottomBar.find( '.button' ).removeClass( 'dark' );
-                    $('#logo').removeClass( 'dark' );
-                    $('#right-bar').removeClass( 'dark' );
+                    $('#logo, #right-bar, #box-general-info').removeClass( 'dark' );
                 }
 
             }

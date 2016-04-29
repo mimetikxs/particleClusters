@@ -120,7 +120,7 @@ APP.templates = {
 APP.data = [
     {
         color: 0xF39C12,
-        position: new THREE.Vector3( 0.0, 0.0, 0.0 ),
+        position: new THREE.Vector3( 0.0, -0.47, 0.0 ),
         name:  "Aprendizajes",
         slug:  "aprendizajes",
         videos: [
@@ -176,6 +176,71 @@ APP.data = [
             }
         ]
     },
+
+
+    //TODO: remove this test cluster ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    {
+        color: 0x3498DB,
+        position: new THREE.Vector3( 0.0, 0.47, 0.0 ),
+        name:  "Aprendizajes",
+        slug:  "dummi",
+        videos: [
+            {
+                url: 'url1',
+                cover: 'url',
+                slug: '01',
+                title: 'Abordar un nuevo proyecto',
+                subtitle: '',
+                description: 'Diseñar un proyecto educativo implica desarrollar una colaboración. Cada proyecto es, desde su inicio, una construcción compartida y consensuada que aúna los conocimientos, experiencia e ideas de los artistas y educadores implicados.',
+                description2: 'Una de las primeras reuniones para abordar el diseño del taller Habitar la pintura.Es el inicio de una colaboración y de un intercambio de saberes: cada proyecto aúna los conocimientos y experiencias de todos los artistas y educadores implicados.',
+                size: 35
+            },
+            {
+                url: 'url1',
+                cover: 'url',
+                slug: '02',
+                title: 'Aprender en distintos contextos',
+                subtitle: '',
+                description: '¿Se plantea igual el trabajo de creación plástica en el contexto educativo formal  y en el no formal? ¿Cómo es la educación artística dentro y fuera de la escuela, o cómo se perciben ambas? El video recoge la visión de varios niños.',
+                description2: '',
+                size: 35
+            },
+            {
+                url: 'url1',
+                cover: 'url',
+                slug: '03',
+                title: 'Diversidad de aprendizajes',
+                subtitle: '',
+                description: 'La inmersión en los talleres implica aprendizajes explícitos como son los relativos al contenido del museo y las exposiciones, y otros implícitos que tienen que ver con la metodología de trabajo en grupo y la activación del pensamiento.',
+                description2: 'La artista Almudena Lobera y las educadoras Elba Díaz y Ana Vaquero inciden en los variados aprendizajes, expresos o implícitos, que entran en juego al participar en un proceso creativo: desde los contenidos de las exposiciones hasta las dinámicas grupales.',
+                size: 35
+            },
+            {
+                url: 'url1',
+                cover: 'url',
+                slug: '04',
+                title: 'Aprendizaje del artista',
+                subtitle: '',
+                description: 'Los artistas que diseñan proyectos educativos en colaboración con el Museo inician un proceso de aprendizaje que pasa por salir de su espacio de trabajo personal,  y adquirir estrategias que faciliten su encuentro con el otro.',
+                description2: '',
+                size: 35
+            },
+            {
+                url: 'url1',
+                cover: 'url',
+                slug: '05',
+                title: 'Recordar-vivido-recordar-aprendido',
+                subtitle: '',
+                description: 'Resulta difícil evaluar los aprendizajes obtenidos en el museo, dado el carácter extraordinario o puntual de sus actividades. ¿Cómo se recuerdan estas actividades una vez transcurrido el tiempo?',
+                description2: '',
+                size: 35
+            }
+        ]
+    },
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     {
         color: 0xE74C3C,
         position: new THREE.Vector3( 0.6, 0.47, 0.0 ),
