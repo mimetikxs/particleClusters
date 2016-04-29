@@ -30,6 +30,12 @@
             <div class="button-close">×</div>
         </div>
 
+        <div class="preloader">
+            <p>
+                CARGANDO...
+            </p>
+        </div>
+
         <div id="box-general-info">
             <div class="button-close">×</div>
             <h2>Acerca de esta página</h2>
@@ -47,6 +53,8 @@
         <script src="lib/dat.gui.min.js"></script>
 		<script src="lib/three.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
+        <script src="lib/imagesloaded.pkgd.min.js"></script>
+        <script src="lib/froogaloop.js"></script>
 
         <script src="src/App.js"></script>
         <script src="src/Particle.js"></script>
@@ -146,11 +154,30 @@
 
         <script>
 
+            var isLoaded = false,
+                preloadVisibleTime = 2000, // the preloader message will be shown a minimum of 2 secs
+                preloadStartTime; // use to calculate the elapsed time
+
             var sceneWidth, sceneHeight;
 
             // render 3D
             var scene, camera, renderer,
                 materialPoints, materialLines, materialInteractiveParticles;
+
+            var textures = [
+                {
+                    uri: "assets/circle-fill.png",
+                    texture: null
+                },
+                {
+                    uri: "assets/circle-line.png",
+                    texture: null
+                },
+                {
+                    uri: "assets/circle-marked.png",
+                    texture: null
+                }
+            ];
 
             // physics model
             var physics,
@@ -194,7 +221,6 @@
 
 
             init();
-            animate();
 
 
             function init() {
@@ -214,9 +240,39 @@
                 renderer.setSize( sceneWidth, sceneHeight );
                 renderer.setClearColor( backgroundColor.getHex() );
 
-		        $layerGl.append( $(renderer.domElement) );
-
                 // buildGui();
+
+                // strat preloading
+                loadImages();
+                preloadStartTime = Date.now();
+                requestAnimationFrame( observePreload );
+
+                // disable mouse events on logos
+                document.getElementById('logo-educar').style.pointerEvents = 'none';
+                document.getElementById('logo').style.pointerEvents = 'none';
+            }
+
+
+            function observePreload() {
+
+                var elapsed = Date.now() - preloadStartTime;
+
+                console.log(elapsed);
+
+                if ( !isLoaded  ||  elapsed < preloadVisibleTime ) {
+                    requestAnimationFrame( observePreload );
+                }
+                else {
+                    $('.preloader').fadeOut( function() {
+                        $('#logo, #logo-educar, #right-bar').css('opacity', 1);
+                        onLoadComplete();
+                    });
+                }
+
+            }
+
+
+            function onLoadComplete() {
 
                 initMaterials();
                 initPhysics();
@@ -234,9 +290,11 @@
 
                 setState( new APP.StateDefault( this, -1 ) );
 
-                // disable mouse events on logos
-                document.getElementById('logo-educar').style.pointerEvents = 'none';
-                document.getElementById('logo').style.pointerEvents = 'none';
+                window.setTimeout(function(){
+                    $layerGl.append( $(renderer.domElement) );
+                    animate();
+                }, 500 );
+
             }
 
 
@@ -276,12 +334,45 @@
             }
 
 
+            function loadImages() {
+
+                var loader = new THREE.TextureLoader(),
+                    loadedCount = 0;
+
+                $('body').imagesLoaded( function() {
+                  loadTexture( textures[ loadedCount ] );
+                });
+
+                function loadTexture( obj ) {
+                    loader.load(
+                        obj.uri,
+                        function( texture ) {
+                            obj.texture = texture;
+
+                            if (loadedCount < textures.length-1) {
+                                loadedCount++;
+                                loadTexture( textures[ loadedCount ] );
+                            } else {
+
+                                isLoaded = true;
+
+                            }
+                        }
+                    );
+                }
+
+            }
+
+
             function initMaterials() {
 
                 var uniforms = {
-            		texture:  { type: "t", value: new THREE.TextureLoader().load( "assets/circle-fill.png" ) },
-            		texture2: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-line.png" ) },
-                    texture3: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-marked.png" ) }
+            		// texture:  { type: "t", value: new THREE.TextureLoader().load( "assets/circle-fill.png" ) },
+            		// texture2: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-line.png" ) },
+                    // texture3: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-marked.png" ) }
+                    texture:  { type: "t", value: textures[0].texture },
+            		texture2: { type: "t", value: textures[1].texture },
+                    texture3: { type: "t", value: textures[2].texture }
             	};
 
                 materialPoints = new THREE.ShaderMaterial( {
