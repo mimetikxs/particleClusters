@@ -373,7 +373,7 @@ APP.Cluster.prototype = {
     },
 
 
-    buildPhysicsInteractive( data ) {
+    buildPhysicsInteractive : function( data ) {
 
         var self = this;
 

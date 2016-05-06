@@ -24,27 +24,40 @@
             <div class="image"></div>
             <div class="info">
                 <div class="title"></div>
+                <div class="subtitle"></div>
                 <div class="description"></div>
                 <div class="button-play">play video</div>
             </div>
             <div class="button-close">×</div>
         </div>
 
-        <div class="preloader">
-            <p>
-                CARGANDO...
-            </p>
+        <div id="main-preloader">
+            <div class="content">
+                <div>
+                    <div class="logo-preload"></div>
+                </div>
+                <div class="info">
+                    Los relatos que se muestran a continuación narran el desarrollo y evolución de la iniciativa Taller de artista que ha tenido lugar en el Museo cada verano durante cinco años, desde 2011 a 2015. Este proyecto ha sido el resultado de una intensa colaboración entre artistas y educadores  con un objetivo común: generar y compartir una experiencia creativa para público infantil en el Museo Reina Sofía.
+                </div>
+                <div>
+                    <div class="logo-educa"></div>
+                </div>
+                <p class="preloading">
+                    CARGANDO...
+                </p>
+            </div>
+
         </div>
 
         <div id="box-general-info">
             <div class="button-close">×</div>
             <h2>Acerca de esta página</h2>
             <p>
-                Lorem ipsum dolor sit amet, eius summo ceteros an has, an congue dissentiet eum. Eam te mucius eligendi. Cu cum decore labitur incorrupte, mel noster senserit percipitur ne, est an vidit molestiae constituto. Est ut ludus zril. Ea duo utinam omittantur. Democritum instructior nec ut.
+                Los relatos que se muestran en esta web narran el desarrollo y evolución de la iniciativa Taller de artista que ha tenido lugar en el Museo cada verano durante cinco años, desde 2011 a 2015. Este proyecto ha sido el resultado de una intensa colaboración entre artistas y educadores  con un objetivo común: generar y compartir una experiencia creativa para público infantil en el Museo Reina Sofía.
             </p>
-            <p>
-                In wisi eirmod nam, ei his harum qualisque. Id nec integre delicatissimi. Nihil saperet ei nam, verear inermis veritus ad est. Fabulas albucius eos et. Sed enim autem et, eros consul partiendo an mea, pro quot adolescens assueverit an. Lorem facer eum ne, qui in tamquam tacimates honestatis.
-            </p>
+            <div>
+                <div class="logo-educa"></div>
+            </div>
         </div>
 
         <div id="bottom-bar"></div>
@@ -155,7 +168,7 @@
         <script>
 
             var isLoaded = false,
-                preloadVisibleTime = 2000, // the preloader message will be shown a minimum of 2 secs
+                preloadVisibleTime = 3000, // the preloader message will be shown a minimum of 3 secs
                 preloadStartTime; // use to calculate the elapsed time
 
             var sceneWidth, sceneHeight;
@@ -242,7 +255,7 @@
 
                 // buildGui();
 
-                // strat preloading
+                // start preloading
                 loadImages();
                 preloadStartTime = Date.now();
                 requestAnimationFrame( observePreload );
@@ -257,13 +270,14 @@
 
                 var elapsed = Date.now() - preloadStartTime;
 
-                console.log(elapsed);
+                console.log(isLoaded, elapsed);
 
                 if ( !isLoaded  ||  elapsed < preloadVisibleTime ) {
+                    $('#main-preloader .preloading').css('opacity', (1 + Math.sin(elapsed/150)) * 0.5 );
+
                     requestAnimationFrame( observePreload );
-                }
-                else {
-                    $('.preloader').fadeOut( function() {
+                } else {
+                    $('#main-preloader').fadeOut( function() {
                         $('#logo, #logo-educar, #right-bar').css('opacity', 1);
                         onLoadComplete();
                     });
@@ -355,6 +369,9 @@
                             } else {
 
                                 isLoaded = true;
+
+                                // remove loading from preloader div
+                                $('#main-preloader .preloading').remove();
 
                             }
                         }

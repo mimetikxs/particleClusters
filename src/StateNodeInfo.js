@@ -50,6 +50,12 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
             .find('.description').text( nodeData.description ).end()
             .css('margin-top', -model.$boxInfo.height()/2);
 
+        if ( nodeData.subtitle !== "" ) {
+            model.$boxInfo.find('.subtitle').text( nodeData.subtitle ).show();
+        } else {
+            model.$boxInfo.find('.subtitle').hide();
+        }
+
         // show info box
         model.$boxInfo
             .css({

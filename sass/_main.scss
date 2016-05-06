@@ -257,6 +257,7 @@ canvas {
 
         .subtitle {
             font-size: 13px;
+            // margin-bottom: 25px;
             // line-height: 20px;
         }
 
@@ -330,6 +331,8 @@ canvas {
         }
         .subtitle {
             font-size: 18px;
+            margin-top: 5px;
+            margin-bottom: 25px;
         }
         .description {
             margin-top: 10px;
@@ -426,12 +429,13 @@ canvas {
         text-align: center;
         text-transform: uppercase;
         margin-top: 0;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         font-size: 23px;
     }
 
     p {
         font-size: 14px;
+        line-height: 22px;
     }
 
     .button-close {
@@ -450,6 +454,15 @@ canvas {
         color: #F2F3F4;
         border-color: #F2F3F4;
         background-color: #1e1c26;
+    }
+
+    .logo-educa {
+        display: inline-block;
+        margin: 0;
+    }
+
+    > div:last-child {
+        text-align: center;
     }
 }
 
@@ -496,15 +509,40 @@ canvas {
     }
 }
 
-.preloader {
+#main-preloader {
     position: absolute;
     width: 100%;
     height: 100%;
     display: table;
     text-align: center;
 
-    p {
+    .content {
         display: table-cell;
         vertical-align: middle;
+    }
+
+    .info {
+        width: 400px;
+        display: inline-block;
+        line-height: 22px;
+    }
+
+    .logo-educa {
+        display: inline-block;
+        margin-top: 0;
+        margin: 20px;
+    }
+
+    .preloading {
+        font-size: 12px;
+    }
+
+    .logo-preload {
+        width: 130px;
+        height: 69px;
+        background: url("../assets/logo.png") no-repeat;
+        background-size: 100%;
+        display: inline-block;
+        margin-bottom: 20px;
     }
 }

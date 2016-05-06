@@ -58,7 +58,7 @@ APP.StateVideo = function( model, categoryIndex, nodeIndex ) {
     this.enter = function() {
 
         var videoData = APP.data[ categoryIndex ].videos[ nodeIndex ],
-            videoId = 64378655; // TODO: use -> videoId = videoData.url;
+            videoId = videoData.url; 
 
         $('body').append(
             '<div id="video-container">' +

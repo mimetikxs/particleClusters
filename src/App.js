@@ -125,7 +125,7 @@ APP.data = [
         slug:  "aprendizajes",
         videos: [
             {
-                url: 'url1',
+                url: '165275625',
                 cover: 'url',
                 slug: 'abordar-nuevo-proyecto',
                 title: 'Abordar un nuevo proyecto',
@@ -135,7 +135,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165276905',
                 cover: 'url',
                 slug: 'aprender-distintos-contextos',
                 title: 'Aprender en distintos contextos',
@@ -145,7 +145,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165276028',
                 cover: 'url',
                 slug: 'diversidad-aprendizajes',
                 title: 'Diversidad de aprendizajes',
@@ -155,7 +155,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165277377',
                 cover: 'url',
                 slug: 'aprendizaje-artista',
                 title: 'Aprendizaje del artista',
@@ -165,10 +165,10 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165281441',
                 cover: 'url',
-                slug: 'Recordar-lo-vivido-recordar-lo-aprendido',
-                title: 'Recordar-vivido-recordar-aprendido',
+                slug: 'Recordar-vivido-recordar-aprendido',
+                title: 'Recordar lo vivido, recordar lo aprendido',
                 subtitle: '',
                 description: 'Resulta difícil evaluar los aprendizajes obtenidos en el museo, dado el carácter extraordinario o puntual de sus actividades. ¿Cómo se recuerdan estas actividades una vez transcurrido el tiempo?',
                 description2: '',
@@ -176,62 +176,59 @@ APP.data = [
             }
         ]
     },
-
-
-    //TODO: remove this test cluster ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     {
-        color: 0x3498DB,
+        color: 0xD35400,
         position: new THREE.Vector3( 0.0, 0.47, 0.0 ),
-        name:  "Aprendizajes",
+        name:  "Vídeos de los talleres",
         slug:  "dummi",
         videos: [
             {
-                url: 'url1',
+                url: '110126881',
                 cover: 'url',
-                slug: '01',
-                title: 'Abordar un nuevo proyecto',
-                subtitle: '',
-                description: 'Diseñar un proyecto educativo implica desarrollar una colaboración. Cada proyecto es, desde su inicio, una construcción compartida y consensuada que aúna los conocimientos, experiencia e ideas de los artistas y educadores implicados.',
-                description2: 'Una de las primeras reuniones para abordar el diseño del taller Habitar la pintura.Es el inicio de una colaboración y de un intercambio de saberes: cada proyecto aúna los conocimientos y experiencias de todos los artistas y educadores implicados.',
-                size: 35
-            },
-            {
-                url: 'url1',
-                cover: 'url',
-                slug: '02',
-                title: 'Aprender en distintos contextos',
-                subtitle: '',
-                description: '¿Se plantea igual el trabajo de creación plástica en el contexto educativo formal  y en el no formal? ¿Cómo es la educación artística dentro y fuera de la escuela, o cómo se perciben ambas? El video recoge la visión de varios niños.',
+                slug: 'a-jugar',
+                title: 'A jugar',
+                subtitle: 'Taller de artista con Leonor Serrano, 2014',
+                description: 'La artista Leonor Serrano Rivas diseñó una experiencia dirigida a niños de 8 a 11 años que les permitió revisar los espacios de juego relacionados con la exposición Playground que habitualmente utilizan parques y plazas, para crear otros nuevos desde un punto de vista divertido y crítico.',
                 description2: '',
                 size: 35
             },
             {
-                url: 'url1',
+                url: '145489992',
                 cover: 'url',
-                slug: '03',
-                title: 'Diversidad de aprendizajes',
-                subtitle: '',
-                description: 'La inmersión en los talleres implica aprendizajes explícitos como son los relativos al contenido del museo y las exposiciones, y otros implícitos que tienen que ver con la metodología de trabajo en grupo y la activación del pensamiento.',
-                description2: 'La artista Almudena Lobera y las educadoras Elba Díaz y Ana Vaquero inciden en los variados aprendizajes, expresos o implícitos, que entran en juego al participar en un proceso creativo: desde los contenidos de las exposiciones hasta las dinámicas grupales.',
-                size: 35
-            },
-            {
-                url: 'url1',
-                cover: 'url',
-                slug: '04',
-                title: 'Aprendizaje del artista',
-                subtitle: '',
-                description: 'Los artistas que diseñan proyectos educativos en colaboración con el Museo inician un proceso de aprendizaje que pasa por salir de su espacio de trabajo personal,  y adquirir estrategias que faciliten su encuentro con el otro.',
+                slug: 'habitar-la-pintura',
+                title: 'Habitar la pintura',
+                subtitle: 'Taller de artista con Miren Doiz, 2015',
+                description: 'Durante esta edición, el taller propusuo un diálogo entre la trayectoria creativa de Miren Doiz (Pamplona, 1980) y las obras que se muestran en dos de las exposiciones temporales del Museo: Fuego Blanco. La colección moderna del Kunstmuseum Basel, y Coleccionismo y Modernidad. Dos casos de estudio: Colecciones Im Obersteg y Rudolf Staechelin.',
                 description2: '',
                 size: 35
             },
             {
-                url: 'url1',
+                url: '27429107',
                 cover: 'url',
-                slug: '05',
-                title: 'Recordar-vivido-recordar-aprendido',
-                subtitle: '',
-                description: 'Resulta difícil evaluar los aprendizajes obtenidos en el museo, dado el carácter extraordinario o puntual de sus actividades. ¿Cómo se recuerdan estas actividades una vez transcurrido el tiempo?',
+                slug: 'reinventar-el-espacio',
+                title: 'Reinventar el espacio',
+                subtitle: 'Taller de artista con Almudena Lobera, 2011',
+                description: 'Primera edición del taller, nacido de la colaboración de artistas jóvenes con el Museo en la elaboración de talleres dirigidos al público infantil. En esta ocasión se cuenta con Almudena Lobera para reinterpretar la obra de otras tres mujeres artistas: Lygia Pape, Yayoi Kusama y Elena Asins, a quienes el Museo dedica, respectivamente, tres exposiciones temporales simultáneas: Lygia Pape. Espacio Imantado, Elena Asins. Fragmentos de la memoria y Yayoi Kusama.',
+                description2: '',
+                size: 35
+            },
+            {
+                url: '51512730',
+                cover: 'url',
+                slug: 'construir-universos',
+                title: 'Construir universos',
+                subtitle: 'Taller de artista con Ignacio Chávarri, 2012',
+                description: 'Partiendo del universo de Rosemarie Trockel, el joven artista Ignacio Chávarri propone a los niños participantes la creación de su propio cosmos personal, integrado tanto por elementos naturales como por aquellos objetos, recuerdos, preferencias, relaciones y ficciones que sean especialmente significativos para cada niño en particular.',
+                description2: '',
+                size: 35
+            },
+            {
+                url: '76033236',
+                cover: 'url',
+                slug: 'los-lugares-del-sueño',
+                title: 'Los lugares del sueño',
+                subtitle: 'Taller de artista con Aída Bañuelos',
+                description: 'Con Los lugares del sueño, taller de cinco días de duración, se pretende que los niños participantes se adentren en el universo de Salvador Dalí y en su singular imaginario, contando para ello con la ayuda de la joven artista Aída Bañuelos. La actividad recorre diversas facetas de la personalidad artística de Dalí, desde las impresiones que el paisaje de su infancia produce en el niño soñador, hasta la minuciosa elaboración posterior de sus imágenes soñadas.',
                 description2: '',
                 size: 35
             }
@@ -249,7 +246,7 @@ APP.data = [
         description: "Lorem ipsum dolor sit amet, ex vim altera consulatu disputationi, ea mediocrem quaerendum vel. Etiam congue audiam ea pri, has stet numquam id. Doming fuisset minimum cum eu, doctus copiosae gloriatur eum eu. Dolorum accumsan deterruisset no nam, alia dolores ad quo. Eam ad eros legere invenire. Erroribus philosophia te has, ut partem ornatus his.",
         videos: [
             {
-                url: 'url1',
+                url: '165276401',
                 cover: 'url',
                 slug: 'percepcion-experiencia-arte',
                 title: 'Percepción y experiencia del arte',
@@ -259,7 +256,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165279935',
                 cover: 'url',
                 slug: 'diversificar-experiencia',
                 title: 'Diversificar la experiencia',
@@ -269,7 +266,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165280170',
                 cover: 'url',
                 slug: 'inmersion-exposiciones',
                 title: 'Inmersión en las exposiciones',
@@ -279,7 +276,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165276591',
                 cover: 'url',
                 slug: 'arte-y-vida-diálogo',
                 title: 'El arte y la vida, en diálogo',
@@ -298,7 +295,7 @@ APP.data = [
         description: "Lorem ipsum dolor sit amet, ex vim altera consulatu disputationi, ea mediocrem quaerendum vel. Etiam congue audiam ea pri, has stet numquam id. Doming fuisset minimum cum eu, doctus copiosae gloriatur eum eu. Dolorum accumsan deterruisset no nam, alia dolores ad quo. Eam ad eros legere invenire. Erroribus philosophia te has, ut partem ornatus his.",
         videos: [
             {
-                url: 'url1',
+                url: '165277723',
                 cover: 'url',
                 slug: 'taller-obra-proceso',
                 title: 'El taller, una obra en proceso',
@@ -308,7 +305,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165278209',
                 cover: 'url',
                 slug: 'artista-museo-aunando-formas-trabajo',
                 title: 'El artista, el museo: aunando formas de trabajo',
@@ -318,7 +315,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165278450',
                 cover: 'url',
                 slug: 'niños-re-crean-taller',
                 title: 'Los niños re-crean el taller',
@@ -328,7 +325,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165279468',
                 cover: 'url',
                 slug: 'tiempo-creatividad',
                 title: 'Tiempo y creatividad',
@@ -338,7 +335,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165279759',
                 cover: 'url',
                 slug: 'continua-revision',
                 title: 'En continua revisión',
@@ -357,7 +354,7 @@ APP.data = [
         description: "Lorem ipsum dolor sit amet, ex vim altera consulatu disputationi, ea mediocrem quaerendum vel. Etiam congue audiam ea pri, has stet numquam id. Doming fuisset minimum cum eu, doctus copiosae gloriatur eum eu. Dolorum accumsan deterruisset no nam, alia dolores ad quo. Eam ad eros legere invenire. Erroribus philosophia te has, ut partem ornatus his.",
         videos: [
             {
-                url: 'url1',
+                url: '165272815',
                 cover: 'url',
                 slug: 'decisiones-compartidas',
                 title: 'Decisiones compartidas',
@@ -367,7 +364,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165276790',
                 cover: 'url',
                 slug: 'iniciativa-del-nino',
                 title: 'Iniciativa del niño',
@@ -377,7 +374,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165278052',
                 cover: 'url',
                 slug: 'superar-dificultades',
                 title: 'Superar dificultades',
@@ -387,7 +384,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165277256',
                 cover: 'url',
                 slug: 'espacios-para-cambio',
                 title: 'Espacios para el cambio',
@@ -405,7 +402,7 @@ APP.data = [
         slug:  "arte-educacion-transformacion",
         videos: [
             {
-                url: 'url1',
+                url: '165276216',
                 cover: 'url',
                 slug: 'arte-como-motor-transformacion',
                 title: 'Arte como motor de transformación',
@@ -415,7 +412,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165280877',
                 cover: 'url',
                 slug: 'sobre-presencia-artistas-educacion',
                 title: 'Sobre la presencia de artistas en la educación',
@@ -425,7 +422,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165281980',
                 cover: 'url',
                 slug: 'vinculos-entre-educacion-creacion-joven',
                 title: 'Vínculos entre la educación y la creación joven',
@@ -435,7 +432,7 @@ APP.data = [
                 size: 35
             },
             {
-                url: 'url1',
+                url: '165282214',
                 cover: 'url',
                 slug: 'puede-proyecto-educativo-cambiar-trayectoria-artista',
                 title: '¿Puede un proyecto educativo cambiar la trayectoria de un artista?',
