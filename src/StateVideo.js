@@ -58,7 +58,7 @@ APP.StateVideo = function( model, categoryIndex, nodeIndex ) {
     this.enter = function() {
 
         var videoData = APP.data[ categoryIndex ].videos[ nodeIndex ],
-            videoId = videoData.url; 
+            videoId = videoData.url;
 
         $('body').append(
             '<div id="video-container">' +
@@ -76,23 +76,11 @@ APP.StateVideo = function( model, categoryIndex, nodeIndex ) {
         // get the player
         player = $f( $('#video-container iframe')[0] );
 
-        player.addEvent('ready', function() {
-           player.addEvent('play', onPlay );
-           player.api('play');
-       });
-
        $('.video-close-button').on( 'click', close );
 
        $(window).on( 'resize', onResize ).resize();
 
    };
-
-
-   function onPlay() {
-       console.log("play event");
-
-       $('#video-container iframe').css('opacity', 1);
-   }
 
 
     this.update = function(){

@@ -93,18 +93,24 @@ body {
 .logo-educa {
     width: 130px;
     height: 69px;
-    background: url("../assets/logo-educa.png") no-repeat;
+    background: url("../assets/logo-educa-back.png") no-repeat;
     background-size: 100%;
     margin: 25px;
 
-    -webkit-filter: invert(0);
-    filter: invert(0);
-    transition: -webkit-filter 800ms,
-                filter 800ms;
+    img {
+        width: 100%;
+        height: auto;
+        -webkit-filter: invert(0);
+        filter: invert(0);
+        transition: -webkit-filter 800ms,
+                    filter 800ms;
+    }
 
     &.dark {
-        -webkit-filter: invert(0.9);
-        filter: invert(0.9);
+        img {
+            -webkit-filter: invert(0.9);
+            filter: invert(0.9);
+        }
     }
 }
 
@@ -328,11 +334,12 @@ canvas {
             font-size: 23px;
             font-weight: bold;
             text-transform: uppercase;
+            margin-bottom: 18px;
         }
         .subtitle {
             font-size: 18px;
-            margin-top: 5px;
-            margin-bottom: 25px;
+            margin-top: -15px;
+            margin-bottom: 18px;
         }
         .description {
             margin-top: 10px;
@@ -388,7 +395,7 @@ canvas {
         user-select: none;
 
         &:hover {
-            color: #000000;
+            // color: #000000;
             background-color: #ffffff;
         }
     }
@@ -435,7 +442,7 @@ canvas {
 
     p {
         font-size: 14px;
-        line-height: 22px;
+        line-height: 20px;
     }
 
     .button-close {
@@ -479,7 +486,6 @@ canvas {
     iframe {
         position: relative;
         top: 50%;
-        opacity: 0;
         transition: opacity 800ms;
     }
 

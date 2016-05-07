@@ -11,7 +11,7 @@
         <div id="layer-nodes"></div>
 
         <div id="logo"></div>
-        <div id="logo-educar" class="logo-educa"></div>
+        <div id="logo-educar" class="logo-educa"><img src="assets/logo-educa-front.png" alt="" /></div>
 
         <div id="right-bar">
             <div class="button" id="btn-info" title="Mostrar información"></div>
@@ -26,22 +26,14 @@
                 <div class="title"></div>
                 <div class="subtitle"></div>
                 <div class="description"></div>
-                <div class="button-play">play video</div>
+                <div class="button-play">ver vídeo</div>
             </div>
             <div class="button-close">×</div>
         </div>
 
         <div id="main-preloader">
             <div class="content">
-                <div>
-                    <div class="logo-preload"></div>
-                </div>
-                <div class="info">
-                    Los relatos que se muestran a continuación narran el desarrollo y evolución de la iniciativa Taller de artista que ha tenido lugar en el Museo cada verano durante cinco años, desde 2011 a 2015. Este proyecto ha sido el resultado de una intensa colaboración entre artistas y educadores  con un objetivo común: generar y compartir una experiencia creativa para público infantil en el Museo Reina Sofía.
-                </div>
-                <div>
-                    <div class="logo-educa"></div>
-                </div>
+                <div class="holder"></div>
                 <p class="preloading">
                     CARGANDO...
                 </p>
@@ -56,7 +48,7 @@
                 Los relatos que se muestran en esta web narran el desarrollo y evolución de la iniciativa Taller de artista que ha tenido lugar en el Museo cada verano durante cinco años, desde 2011 a 2015. Este proyecto ha sido el resultado de una intensa colaboración entre artistas y educadores  con un objetivo común: generar y compartir una experiencia creativa para público infantil en el Museo Reina Sofía.
             </p>
             <div>
-                <div class="logo-educa"></div>
+                <div class="logo-educa"><img src="assets/logo-educa-front.png" alt="" /></div>
             </div>
         </div>
 
@@ -64,6 +56,7 @@
 
         <script src="lib/jquery-1.12.0.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
+        <script src="lib/Detector.js"></script>
 		<script src="lib/three.min.js"></script>
         <script src="lib/dat.gui.min.js"></script>
         <script src="lib/imagesloaded.pkgd.min.js"></script>
@@ -233,7 +226,20 @@
             var randomRadius, randomStrengthInteractive;
 
 
-            init();
+            if ( ! Detector.webgl ) {
+					$('#main-preloader .preloading').remove();
+                    $('#main-preloader .holder')
+                        .css('margin-top', '-80px')
+                        .html(
+                        '<h2>TU NAVEGADOR ESTÁ <br> DESACTUALIZADO</h2>' +
+                        '<p> Necesitas un navegador moderno <br> para poder visualizar este site. </p>' +
+                        '<p> Descárgarlo <a href="http://outdatedbrowser.com/es">aquí</a></p>'
+                    );
+			} else {
+                init();
+            }
+
+
 
 
             function init() {
@@ -255,6 +261,23 @@
 
                 // buildGui();
 
+                // show intro message
+                $('#main-preloader .preloading').css('opacity', 0);
+                $('#main-preloader .holder')
+                    .fadeOut(0)
+                    .html(
+                        '<div>' +
+                            '<div class="logo-preload"></div>' +
+                        '</div>' +
+                        '<div class="info">' +
+                            'Los relatos que se muestran a continuación narran el desarrollo y evolución de la iniciativa Taller de artista que ha tenido lugar en el Museo cada verano durante cinco años, desde 2011 a 2015. Este proyecto ha sido el resultado de una intensa colaboración entre artistas y educadores  con un objetivo común: generar y compartir una experiencia creativa para público infantil en el Museo Reina Sofía.' +
+                        '</div>' +
+                        '<div>' +
+                            '<div class="logo-educa"><img src="assets/logo-educa-front.png" alt="" /></div>' +
+                        '</div>'
+                    )
+                    .fadeIn(500);
+
                 // start preloading
                 loadImages();
                 preloadStartTime = Date.now();
@@ -273,8 +296,6 @@
                 console.log(isLoaded, elapsed);
 
                 if ( !isLoaded  ||  elapsed < preloadVisibleTime ) {
-                    $('#main-preloader .preloading').css('opacity', (1 + Math.sin(elapsed/150)) * 0.5 );
-
                     requestAnimationFrame( observePreload );
                 } else {
                     $('#main-preloader').fadeOut( function() {
@@ -370,9 +391,6 @@
 
                                 isLoaded = true;
 
-                                // remove loading from preloader div
-                                $('#main-preloader .preloading').remove();
-
                             }
                         }
                     );
@@ -384,9 +402,6 @@
             function initMaterials() {
 
                 var uniforms = {
-            		// texture:  { type: "t", value: new THREE.TextureLoader().load( "assets/circle-fill.png" ) },
-            		// texture2: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-line.png" ) },
-                    // texture3: { type: "t", value: new THREE.TextureLoader().load( "assets/circle-marked.png" ) }
                     texture:  { type: "t", value: textures[0].texture },
             		texture2: { type: "t", value: textures[1].texture },
                     texture3: { type: "t", value: textures[2].texture }
@@ -404,7 +419,6 @@
     			});
 
                 materialLines = new THREE.LineBasicMaterial( { color: 0x999999, linewidth: 1, transparent: true, opacity: 0.2, depthTest: false } );
-                //materialLines.visible = true;
 
                 materialLines2 = new THREE.ShaderMaterial( {
     				vertexShader: document.getElementById( 'vertexshaderLines' ).textContent,
@@ -412,7 +426,6 @@
 
     				depthTest:       false,
     				transparent:     true,
-                    // alphaTest:       0.5
     			});
 
                 materialInteractiveParticles = new THREE.PointsMaterial({
@@ -750,10 +763,10 @@
                 // css transitions
                 if ( targetTheme === APP.theme.dark ){
                     $bottomBar.find( '.button' ).addClass( 'dark' );
-                    $('#logo, #right-bar, #box-general-info').addClass( 'dark' );
+                    $('#logo, #right-bar, #box-general-info, .logo-educa').addClass( 'dark' );
                 } else {
                     $bottomBar.find( '.button' ).removeClass( 'dark' );
-                    $('#logo, #right-bar, #box-general-info').removeClass( 'dark' );
+                    $('#logo, #right-bar, #box-general-info, .logo-educa').removeClass( 'dark' );
                 }
 
             }

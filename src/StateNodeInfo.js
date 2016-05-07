@@ -70,7 +70,15 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
             .on( 'click', close );
 
         // attach events to play button
-        $('.button-play').on( 'click', playVideo );
+        $('.button-play')
+            .css( 'color', '#ffffff' )
+            .on( 'mouseenter', function(){
+                $(this).css( 'color', clusterColor );
+            })
+            .on( 'mouseleave', function(){
+                $(this).css( 'color', '#ffffff' );
+            })
+            .on( 'click', playVideo );
 
         // attach event to general info btn
         $('#btn-info').on( 'click', showGeneralInfo );
