@@ -418,7 +418,9 @@ th {
   src: url("webfonts/294CD0_E_0.eot");
   src: url("webfonts/294CD0_E_0.eot?#iefix") format("embedded-opentype"), url("webfonts/294CD0_E_0.woff") format("woff"), url("webfonts/294CD0_E_0.ttf") format("truetype"); }
 body {
-  overflow: hidden; }
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
 
 #layer-nodes,
 #layer-gl {
@@ -636,12 +638,12 @@ canvas {
       margin-bottom: 18px; }
     #box-info .info .subtitle {
       font-size: 18px;
-      margin-top: -15px;
+      margin-top: -17px;
       margin-bottom: 18px; }
     #box-info .info .description {
       margin-top: 10px;
       margin-bottom: 30px;
-      font-size: 14px;
+      font-size: 15px;
       text-align: left; }
   #box-info .button-close {
     position: absolute;
@@ -657,7 +659,7 @@ canvas {
     cursor: pointer; }
   #box-info .button-play {
     padding: 10px;
-    border: 3px solid white;
+    border: 1px solid white;
     display: inline-block;
     position: relative;
     width: 90px;
@@ -666,7 +668,6 @@ canvas {
     cursor: pointer;
     text-transform: uppercase;
     font-size: 14px;
-    font-weight: bold;
     transition: background-color 300ms ease-out ,color 300ms ease-out;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -707,7 +708,7 @@ canvas {
     margin-bottom: 20px;
     font-size: 23px; }
   #box-general-info p {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 20px; }
   #box-general-info .button-close {
     position: absolute;

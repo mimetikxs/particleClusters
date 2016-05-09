@@ -1,5 +1,7 @@
 body {
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 #layer-nodes,
@@ -338,13 +340,13 @@ canvas {
         }
         .subtitle {
             font-size: 18px;
-            margin-top: -15px;
+            margin-top: -17px;
             margin-bottom: 18px;
         }
         .description {
             margin-top: 10px;
             margin-bottom: 30px;
-            font-size: 14px;
+            font-size: 15px;
             text-align: left;
         }
     }
@@ -372,7 +374,7 @@ canvas {
 
     .button-play {
         padding: 10px;
-        border: 3px solid white;
+        border: 1px solid white;
         display: inline-block;
         position: relative;
         width: 90px;
@@ -381,7 +383,6 @@ canvas {
         cursor: pointer;
         text-transform: uppercase;
         font-size: 14px;
-        font-weight: bold;
 
         transition: background-color 300ms ease-out
                     ,color 300ms ease-out;
@@ -441,7 +442,7 @@ canvas {
     }
 
     p {
-        font-size: 14px;
+        font-size: 15px;
         line-height: 20px;
     }
 

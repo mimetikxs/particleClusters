@@ -126,7 +126,7 @@ APP.data = [
         videos: [
             {
                 url: '165275625',
-                cover: 'url',
+                cover: '1B.png',
                 slug: 'abordar-nuevo-proyecto',
                 title: 'Abordar un nuevo proyecto',
                 subtitle: '',
@@ -136,7 +136,7 @@ APP.data = [
             },
             {
                 url: '165276905',
-                cover: 'url',
+                cover: '3B.png',
                 slug: 'aprender-distintos-contextos',
                 title: 'Aprender en distintos contextos',
                 subtitle: '',
@@ -146,7 +146,7 @@ APP.data = [
             },
             {
                 url: '165276028',
-                cover: 'url',
+                cover: '1C.png',
                 slug: 'diversidad-aprendizajes',
                 title: 'Diversidad de aprendizajes',
                 subtitle: '',
@@ -156,7 +156,7 @@ APP.data = [
             },
             {
                 url: '165277377',
-                cover: 'url',
+                cover: '3D.png',
                 slug: 'aprendizaje-artista',
                 title: 'Aprendizaje del artista',
                 subtitle: '',
@@ -166,7 +166,7 @@ APP.data = [
             },
             {
                 url: '165281441',
-                cover: 'url',
+                cover: '5D.png',
                 slug: 'Recordar-vivido-recordar-aprendido',
                 title: 'Recordar lo vivido, recordar lo aprendido',
                 subtitle: '',
@@ -180,11 +180,11 @@ APP.data = [
         color: 0xD35400,
         position: new THREE.Vector3( 0.0, 0.47, 0.0 ),
         name:  "Vídeos de los talleres",
-        slug:  "dummi",
+        slug:  "videos-de-los-talleres",
         videos: [
             {
                 url: '110126881',
-                cover: 'url',
+                cover: 'A-jugar.png',
                 slug: 'a-jugar',
                 title: 'A jugar',
                 subtitle: 'Taller de artista con Leonor Serrano, 2014',
@@ -194,7 +194,7 @@ APP.data = [
             },
             {
                 url: '145489992',
-                cover: 'url',
+                cover: 'habitar-pintura.png',
                 slug: 'habitar-la-pintura',
                 title: 'Habitar la pintura',
                 subtitle: 'Taller de artista con Miren Doiz, 2015',
@@ -204,7 +204,7 @@ APP.data = [
             },
             {
                 url: '27429107',
-                cover: 'url',
+                cover: 'reiventar-espacio.png',
                 slug: 'reinventar-el-espacio',
                 title: 'Reinventar el espacio',
                 subtitle: 'Taller de artista con Almudena Lobera, 2011',
@@ -214,7 +214,7 @@ APP.data = [
             },
             {
                 url: '51512730',
-                cover: 'url',
+                cover: 'construir-universos.png',
                 slug: 'construir-universos',
                 title: 'Construir universos',
                 subtitle: 'Taller de artista con Ignacio Chávarri, 2012',
@@ -224,7 +224,7 @@ APP.data = [
             },
             {
                 url: '76033236',
-                cover: 'url',
+                cover: 'lugares-suenos.png',
                 slug: 'los-lugares-del-sueño',
                 title: 'Los lugares del sueño',
                 subtitle: 'Taller de artista con Aída Bañuelos',
@@ -247,7 +247,7 @@ APP.data = [
         videos: [
             {
                 url: '165276401',
-                cover: 'url',
+                cover: '2A.png',
                 slug: 'percepcion-experiencia-arte',
                 title: 'Percepción y experiencia del arte',
                 subtitle: '',
@@ -257,7 +257,7 @@ APP.data = [
             },
             {
                 url: '165279935',
-                cover: 'url',
+                cover: '4F.png',
                 slug: 'diversificar-experiencia',
                 title: 'Diversificar la experiencia',
                 subtitle: '',
@@ -267,7 +267,7 @@ APP.data = [
             },
             {
                 url: '165280170',
-                cover: 'url',
+                cover: '5B.png',
                 slug: 'inmersion-exposiciones',
                 title: 'Inmersión en las exposiciones',
                 subtitle: '',
@@ -277,7 +277,7 @@ APP.data = [
             },
             {
                 url: '165276591',
-                cover: 'url',
+                cover: '2B.png',
                 slug: 'arte-y-vida-diálogo',
                 title: 'El arte y la vida, en diálogo',
                 subtitle: '',
@@ -296,7 +296,7 @@ APP.data = [
         videos: [
             {
                 url: '165277723',
-                cover: 'url',
+                cover: '4A.png',
                 slug: 'taller-obra-proceso',
                 title: 'El taller, una obra en proceso',
                 subtitle: '',
@@ -306,7 +306,7 @@ APP.data = [
             },
             {
                 url: '165278209',
-                cover: 'url',
+                cover: '4B.png',
                 slug: 'artista-museo-aunando-formas-trabajo',
                 title: 'El artista, el museo: aunando formas de trabajo',
                 subtitle: '',
@@ -316,7 +316,7 @@ APP.data = [
             },
             {
                 url: '165278450',
-                cover: 'url',
+                cover: '4C.png',
                 slug: 'niños-re-crean-taller',
                 title: 'Los niños re-crean el taller',
                 subtitle: '',
@@ -326,7 +326,7 @@ APP.data = [
             },
             {
                 url: '165279468',
-                cover: 'url',
+                cover: '4D.png',
                 slug: 'tiempo-creatividad',
                 title: 'Tiempo y creatividad',
                 subtitle: '',
@@ -336,7 +336,7 @@ APP.data = [
             },
             {
                 url: '165279759',
-                cover: 'url',
+                cover: '4E.png',
                 slug: 'continua-revision',
                 title: 'En continua revisión',
                 subtitle: '',
@@ -355,7 +355,7 @@ APP.data = [
         videos: [
             {
                 url: '165272815',
-                cover: 'url',
+                cover: '1A.png',
                 slug: 'decisiones-compartidas',
                 title: 'Decisiones compartidas',
                 subtitle: '',
@@ -365,7 +365,7 @@ APP.data = [
             },
             {
                 url: '165276790',
-                cover: 'url',
+                cover: '3A.png',
                 slug: 'iniciativa-del-nino',
                 title: 'Iniciativa del niño',
                 subtitle: '',
@@ -375,7 +375,7 @@ APP.data = [
             },
             {
                 url: '165278052',
-                cover: 'url',
+                cover: '3E.png',
                 slug: 'superar-dificultades',
                 title: 'Superar dificultades',
                 subtitle: '',
@@ -385,7 +385,7 @@ APP.data = [
             },
             {
                 url: '165277256',
-                cover: 'url',
+                cover: '3C.png',
                 slug: 'espacios-para-cambio',
                 title: 'Espacios para el cambio',
                 subtitle: '',
@@ -403,7 +403,7 @@ APP.data = [
         videos: [
             {
                 url: '165276216',
-                cover: 'url',
+                cover: '1D.png',
                 slug: 'arte-como-motor-transformacion',
                 title: 'Arte como motor de transformación',
                 subtitle: '',
@@ -413,7 +413,7 @@ APP.data = [
             },
             {
                 url: '165280877',
-                cover: 'url',
+                cover: '5D.png',
                 slug: 'sobre-presencia-artistas-educacion',
                 title: 'Sobre la presencia de artistas en la educación',
                 subtitle: '',
@@ -423,7 +423,7 @@ APP.data = [
             },
             {
                 url: '165281980',
-                cover: 'url',
+                cover: '5E1.png',
                 slug: 'vinculos-entre-educacion-creacion-joven',
                 title: 'Vínculos entre la educación y la creación joven',
                 subtitle: '',
@@ -433,7 +433,7 @@ APP.data = [
             },
             {
                 url: '165282214',
-                cover: 'url',
+                cover: '5E2.png',
                 slug: 'puede-proyecto-educativo-cambiar-trayectoria-artista',
                 title: '¿Puede un proyecto educativo cambiar la trayectoria de un artista?',
                 subtitle: '',

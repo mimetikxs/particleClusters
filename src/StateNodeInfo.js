@@ -45,6 +45,7 @@ APP.StateNodeInfo = function( model, categoryIndex, nodeIndex ) {
 
         // build info box
         model.$boxInfo
+            .find( '.image' ).css('background-image', 'url(media/'+nodeData.cover+')').end()
             .find( '.title' ).text( nodeData.title ).end()
             // .find('.subtitle').text( nodeData.subtitle ).end()
             .find('.description').text( nodeData.description ).end()
